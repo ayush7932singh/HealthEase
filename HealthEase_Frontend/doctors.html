@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthEase - Find a Doctor</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* --- Page Specific Styles --- */
+        body { background-color: #f8f9fa; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        /* Navbar Spacing */
+        .page-header {
+            padding-top: 100px; padding-bottom: 40px;
+            text-align: center; background: white; border-bottom: 1px solid #e2e8f0;
+        }
+        .page-header h2 { font-size: 2.2rem; color: #1e293b; margin-bottom: 10px; }
+        .page-header p { color: #64748b; font-size: 1.1rem; }
+
+        /* Doctors Grid */
+        .content-section { padding: 50px 0; }
+        .doctors-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+
+        /* Doctor Card */
+        .doctor-card {
+            background: white; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex; flex-direction: column; border: 1px solid #f1f5f9;
+        }
+        .doctor-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+        .doc-img-container { height: 250px; overflow: hidden; background: #e2e8f0; position: relative; }
+        .doc-img-container img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+
+        .doc-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        .doc-name { font-size: 1.25rem; font-weight: 600; color: #1e293b; margin-bottom: 5px; }
+        .doc-spec { color: #007bff; font-weight: 500; font-size: 0.95rem; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .doc-stats {
+            display: flex; justify-content: space-between; margin-bottom: 20px;
+            font-size: 0.9rem; color: #64748b; background: #f8fafc;
+            padding: 10px; border-radius: 8px;
+        }
+        .doc-price { font-weight: 700; color: #1e293b; }
+
+        .book-btn { margin-top: auto; width: 100%; padding: 12px; border-radius: 8px; font-weight: 600; }
+
+        /* Status & Loading */
+        .status-message { grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b; }
+        .loading-spinner { font-size: 2rem; color: #007bff; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Auth Modal (Hidden by default) */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; width: 100%; max-width: 400px; position: relative; }
+        .close { float: right; font-size: 28px; cursor: pointer; color: #aaa; }
+        .full-width { width: 100%; margin-top: 15px; }
+
+        /* --- ✨ PROFESSIONAL FOOTER STYLES --- */
+        .modern-footer {
+            background-color: #1e293b; /* Dark Navy Blue */
+            color: white;
+            padding: 60px 0 20px;
+            margin-top: auto;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem; font-weight: 700; margin-bottom: 15px;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .footer-widget h3 {
+            font-size: 1.1rem; margin-bottom: 20px; color: #f8fafc;
+            border-bottom: 2px solid #007bff; display: inline-block; padding-bottom: 5px;
+        }
+
+        .footer-links { list-style: none; padding: 0; }
+        .footer-links li { margin-bottom: 12px; }
+        .footer-links a { color: #cbd5e1; text-decoration: none; transition: 0.3s; }
+        .footer-links a:hover { color: white; padding-left: 5px; color: #007bff; }
+
+        .contact-info { list-style: none; padding: 0; }
+        .contact-info li { display: flex; gap: 10px; margin-bottom: 15px; color: #cbd5e1; }
+        .contact-info i { color: #007bff; margin-top: 4px; }
+
+        .footer-bottom {
+            text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;
+        }
+        .copyright p { color: #94a3b8; font-size: 0.9rem; margin: 0; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i> <span>HealthEase</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="features.html">Features</a></li>
+                    <li><a href="doctors.html" class="active">Doctors</a></li>
+                    <li id="adminLink" style="display: none;">
+                        <a href="admin_panel.html" style="color: #dc3545;">Admin</a>
+                    </li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons" id="authBtnContainer">
+                <button class="btn btn-outline" onclick="window.location.href='index.html'">Login</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h2>Meet Our Specialists</h2>
+            <p>Book appointments with the best doctors in your city.</p>
+        </div>
+    </section>
+
+    <main class="content-section">
+        <div class="container">
+            <div class="doctors-grid" id="doctorsGrid">
+                <div class="status-message">
+                    <i class="fas fa-circle-notch loading-spinner"></i>
+                    <p style="margin-top: 10px;">Finding best doctors for you...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="modern-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-widget">
+                    <div class="footer-logo"><i class="fas fa-heartbeat"></i> HealthEase</div>
+                    <p style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.6;">
+                        Your trusted partner in digital healthcare. We connect patients with top-tier medical professionals for a seamless experience.
+                    </p>
+                </div>
+
+                <div class="footer-widget">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="features.html">Our Features</a></li>
+                        <li><a href="doctors.html">Find a Doctor</a></li>
+                        <li><a href="dashboard.html">Patient Dashboard</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-widget">
+                    <h3>Contact Us</h3>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-map-marker-alt"></i> <span>123 Medical District, Tech City, NY 10001</span></li>
+                        <li><i class="fas fa-phone-alt"></i> <span>+1 (555) 123-4567</span></li>
+                        <li><i class="fas fa-envelope"></i> <span>support@healthease.com</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="copyright"><p>&copy; 2025 HealthEase. All rights reserved.</p></div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="appointmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('appointmentModal')">&times;</span>
+            <h2 style="margin-bottom: 20px; color: #1e293b;">Book Appointment</h2>
+            <form id="appointmentForm">
+                <input type="hidden" id="selectedDocId">
+                <div class="form-group">
+                    <label>Doctor</label>
+                    <input type="text" id="docNameInput" class="form-control" readonly style="background: #f1f5f9;">
+                </div>
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="apptDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Time</label>
+                        <input type="time" id="apptTime" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Symptoms</label>
+                    <textarea id="symptoms" class="form-control" rows="3" placeholder="Describe your issue..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary full-width">Proceed to Payment <i class="fas fa-arrow-right"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <i class="fas fa-lock" style="font-size: 3rem; color: #64748b; margin-bottom: 15px;"></i>
+            <h3 style="margin-bottom: 10px;">Login Required</h3>
+            <p style="color: #64748b; margin-bottom: 20px;">You need to login to book an appointment.</p>
+            <button class="btn btn-primary full-width" onclick="window.location.href='index.html'">Go to Login</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:3000/api';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            fetchDoctors();
+
+            // Set Min Date to Today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('apptDate').setAttribute('min', today);
+        });
+
+        // 1. Auth Check
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const container = document.getElementById('authBtnContainer');
+            const adminLink = document.getElementById('adminLink');
+
+            if (user) {
+                if (user.role === 'admin' && adminLink) adminLink.style.display = 'block';
+                container.innerHTML = `<button class="btn btn-outline" onclick="logout()">Logout (${user.name.split(' ')[0]})</button>`;
+            } else {
+                container.innerHTML = `<button class="btn btn-primary" onclick="window.location.href='index.html'">Login</button>`;
+            }
+        }
+
+        // 2. Fetch Doctors
+        async function fetchDoctors() {
+            const grid = document.getElementById('doctorsGrid');
+            try {
+                const response = await fetch(`${API_BASE}/doctors`);
+                const data = await response.json();
+                
+                if (data.doctors && data.doctors.length > 0) {
+                    grid.innerHTML = data.doctors.map(doc => `
+                        <div class="doctor-card">
+                            <div class="doc-img-container">
+                                <img src="${doc.image || 'https://via.placeholder.com/300'}" onerror="this.src='https://ui-avatars.com/api/?name=${doc.name}'">
+                            </div>
+                            <div class="doc-info">
+                                <h3 class="doc-name">${doc.name}</h3>
+                                <div class="doc-spec">${doc.specialization}</div>
+                                <div class="doc-stats">
+                                    <span><i class="fas fa-star" style="color:#ffc107"></i> ${doc.rating}</span>
+                                    <span>${doc.experience} Yrs Exp</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                    <span style="color:#64748b; font-size:0.9rem;">Fee:</span>
+                                    <span class="doc-price">₹${doc.consultation_fee}</span>
+                                </div>
+                                <button class="btn btn-primary book-btn" onclick="openBooking('${doc.id}', '${doc.name}')">Book Appointment</button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    grid.innerHTML = '<div class="status-message"><p>No doctors found.</p></div>';
+                }
+            } catch (error) {
+                grid.innerHTML = '<div class="status-message"><p>Could not connect to server. Ensure Backend is running.</p></div>';
+            }
+        }
+
+        // 3. Booking Logic
+        function openBooking(docId, docName) {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                document.getElementById('loginModal').style.display = 'flex';
+                return;
+            }
+            document.getElementById('selectedDocId').value = docId;
+            document.getElementById('docNameInput').value = docName;
+            document.getElementById('appointmentModal').style.display = 'flex';
+        }
+
+        // 🔥 REDIRECT TO PAYMENT (Logic Updated)
+        document.getElementById('appointmentForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert("Session invalid. Please login again.");
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // 1. Data Collect karo
+            const bookingData = {
+                doctorId: document.getElementById('selectedDocId').value,
+                doctorName: document.getElementById('docNameInput').value, // Saved for UI on payment page
+                date: document.getElementById('apptDate').value,
+                time: document.getElementById('apptTime').value,
+                symptoms: document.getElementById('symptoms').value
+            };
+
+            // 2. Data ko browser mein save karo taaki payment page padh sake
+            localStorage.setItem('tempAppointmentData', JSON.stringify(bookingData));
+            localStorage.setItem('tempDoctorName', bookingData.doctorName);
+            localStorage.setItem('tempAppointmentDate', bookingData.date);
+
+            // 3. Seedha Payment Page par bhej do
+            window.location.href = 'payment.html'; 
+        });
+
+        // 4. Helpers
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+
+        window.onclick = function(e) {
+            if (e.target.classList.contains('modal')) e.target.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

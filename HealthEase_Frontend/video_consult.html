@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthEase - Video Consultation</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* --- Layout Fixes --- */
+        body {
+            background-color: #202124; /* Dark background for video focus */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            color: white;
+        }
+
+        /* Video Container */
+        .video-container {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 20px;
+            height: calc(100vh - 160px);
+            padding: 20px 0;
+        }
+
+        /* Main Video Area */
+        .main-video-area {
+            background: #000;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .main-video-area img {
+            width: 100%; height: 100%; object-fit: cover; opacity: 0.9;
+        }
+
+        /* Overlays on Video */
+        .remote-label {
+            position: absolute; top: 20px; left: 20px;
+            background: rgba(0,0,0,0.6); color: white;
+            padding: 8px 15px; border-radius: 20px;
+            font-size: 0.9rem; display: flex; align-items: center; gap: 8px;
+            backdrop-filter: blur(5px);
+        }
+
+        .call-timer {
+            position: absolute; top: 20px; right: 20px;
+            background: rgba(255,0,0,0.7); color: white;
+            padding: 5px 12px; border-radius: 5px;
+            font-weight: 600; font-size: 0.9rem;
+            animation: pulse 2s infinite;
+        }
+
+        .connection-status {
+            position: absolute; top: 20px; right: 90px;
+            color: #22c55e; font-size: 0.9rem;
+            background: rgba(0,0,0,0.6); padding: 5px 10px;
+            border-radius: 5px; backdrop-filter: blur(5px);
+        }
+
+        /* Small Self Video */
+        .my-video-feed {
+            position: absolute; bottom: 20px; right: 20px;
+            width: 180px; height: 120px;
+            background: #333; border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.3);
+            overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            transition: transform 0.3s;
+            cursor: move;
+        }
+        .my-video-feed:hover { transform: scale(1.05); }
+
+        /* Controls Bar */
+        .controls-bar {
+            position: absolute; bottom: 30px; left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(15px);
+            padding: 12px 30px; border-radius: 50px;
+            display: flex; gap: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .control-btn {
+            width: 50px; height: 50px; border-radius: 50%;
+            border: none; font-size: 1.2rem; cursor: pointer;
+            transition: 0.3s; display: flex;
+            align-items: center; justify-content: center;
+            color: white; background: rgba(255,255,255,0.2);
+        }
+        
+        .control-btn:hover { background: rgba(255,255,255,0.4); transform: translateY(-3px); }
+        .btn-end { background: #ef4444; }
+        .btn-end:hover { background: #dc2626; }
+
+        /* Chat Sidebar */
+        .chat-sidebar {
+            background: white; border-radius: 15px;
+            display: flex; flex-direction: column;
+            overflow: hidden; color: #333;
+        }
+
+        .chat-header {
+            padding: 15px; background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            font-weight: 600; color: #1e293b;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .chat-messages {
+            flex: 1; padding: 15px; overflow-y: auto;
+            background: #fff; display: flex; flex-direction: column; gap: 10px;
+        }
+
+        .message {
+            padding: 10px 14px; border-radius: 10px;
+            font-size: 0.9rem; max-width: 80%;
+            line-height: 1.4;
+        }
+
+        .msg-received { background: #f1f5f9; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .msg-sent { background: #007bff; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+
+        .chat-input {
+            padding: 15px; border-top: 1px solid #eee;
+            display: flex; gap: 10px; background: #f8f9fa;
+        }
+
+        .typing-indicator {
+            font-size: 0.75rem; color: #94a3b8; font-style: italic;
+            margin-left: 15px; margin-bottom: 5px; display: none;
+        }
+
+        /* Animations */
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .video-container { grid-template-columns: 1fr; height: auto; }
+            .chat-sidebar { height: 300px; }
+            .my-video-feed { width: 120px; height: 80px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header style="background: white; padding: 15px 0;">
+        <div class="container header-container">
+            <div class="logo"><i class="fas fa-heartbeat" style="color: #007bff;"></i> <span style="color: #1e293b;">HealthEase</span></div>
+            <nav>
+                <a href="dashboard.html" class="btn btn-outline" style="color: #1e293b; border-color: #ddd;">
+                    <i class="fas fa-arrow-left"></i> Leave Consult
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="video-container">
+            
+            <div class="main-video-area">
+                <div class="remote-label">
+                    <i class="fas fa-circle" style="color: #22c55e; font-size: 8px;"></i> 
+                    Dr. Sarah Johnson
+                </div>
+                <div class="connection-status" title="Encrypted Connection">
+                    <i class="fas fa-lock"></i> Secure
+                </div>
+                <div class="call-timer" id="callTimer">00:00</div>
+
+                <img src="https://img.freepik.com/free-photo/portrait-smiling-handsome-male-doctor-man_171337-5055.jpg" alt="Doctor">
+
+                <div class="my-video-feed" id="myFeed">
+                    <img src="https://ui-avatars.com/api/?name=You&background=random" style="width:100%; height:100%; object-fit:cover;" alt="Me">
+                </div>
+
+                <div class="controls-bar">
+                    <button class="control-btn" onclick="toggleState(this, 'fa-microphone', 'fa-microphone-slash')" title="Mute/Unmute">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="control-btn" onclick="toggleState(this, 'fa-video', 'fa-video-slash')" title="Video On/Off">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="control-btn" onclick="alert('Screen sharing not available in demo.')" title="Share Screen">
+                        <i class="fas fa-desktop"></i>
+                    </button>
+                    <button class="control-btn btn-end" onclick="endCall()" title="End Call">
+                        <i class="fas fa-phone-slash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="chat-sidebar">
+                <div class="chat-header">
+                    <span><i class="fas fa-comments" style="color: #007bff;"></i> Live Chat</span>
+                    <i class="fas fa-ellipsis-v" style="color: #94a3b8; cursor: pointer;"></i>
+                </div>
+                
+                <div class="chat-messages" id="chatBox">
+                    <div class="message msg-received"><strong>Dr. Sarah:</strong> Hello! Can you hear me clearly?</div>
+                    <div class="message msg-received"><strong>Dr. Sarah:</strong> Please describe your symptoms in detail.</div>
+                </div>
+                
+                <div class="typing-indicator" id="typingIndicator">Dr. Sarah is typing...</div>
+
+                <div class="chat-input">
+                    <input type="text" id="msgInput" class="form-control" placeholder="Type a message..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    <button class="btn btn-primary" onclick="sendMessage()" style="padding: 0 15px; border-radius: 5px;">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 1. Auth Check
+        const authToken = localStorage.getItem('token');
+        if (!authToken) {
+            alert("⚠️ Please Login First!");
+            window.location.href = 'index.html'; 
+        }
+
+        // 2. Timer Logic
+        let seconds = 0;
+        setInterval(() => {
+            seconds++;
+            const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const secs = (seconds % 60).toString().padStart(2, '0');
+            document.getElementById('callTimer').innerText = `${mins}:${secs}`;
+        }, 1000);
+
+        // 3. Toggle Buttons (Mute/Video)
+        function toggleState(btn, iconOn, iconOff) {
+            const icon = btn.querySelector('i');
+            if (icon.classList.contains(iconOn)) {
+                icon.classList.replace(iconOn, iconOff);
+                btn.style.background = '#ef4444'; // Red
+            } else {
+                icon.classList.replace(iconOff, iconOn);
+                btn.style.background = 'rgba(255,255,255,0.2)'; // Normal
+            }
+        }
+
+        // 4. End Call
+        function endCall() {
+            if(confirm("End Consultation?")) {
+                window.location.href = 'dashboard.html';
+            }
+        }
+
+        // 5. Chat & Auto Reply Feature
+        function sendMessage() {
+            const input = document.getElementById('msgInput');
+            const chatBox = document.getElementById('chatBox');
+            const text = input.value.trim();
+            
+            if (text !== "") {
+                // User Message
+                addMessage('You', text, 'msg-sent');
+                input.value = "";
+
+                // Simulated Doctor Reply
+                showTyping(true);
+                setTimeout(() => {
+                    showTyping(false);
+                    const replies = [
+                        "I see. How long have you been feeling this way?",
+                        "Okay, I am noting that down.",
+                        "Have you taken any medication for this?",
+                        "Don't worry, we will treat this.",
+                        "Please hold on for a second."
+                    ];
+                    const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                    addMessage('Dr. Sarah', randomReply, 'msg-received');
+                }, 2000); // 2 seconds delay
+            }
+        }
+
+        function addMessage(sender, text, className) {
+            const chatBox = document.getElementById('chatBox');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${className}`;
+            msgDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function showTyping(show) {
+            document.getElementById('typingIndicator').style.display = show ? 'block' : 'none';
+        }
+
+        // Allow Enter key to send
+        document.getElementById('msgInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+    </script>
+</body>
+</html>

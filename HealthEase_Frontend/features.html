@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthEase - Our Features</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* Layout Fixes */
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            padding: 100px 0 40px;
+            text-align: center;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .page-header h2 { font-size: 2.5rem; color: #1e293b; margin-bottom: 10px; }
+        .page-header p { color: #64748b; font-size: 1.1rem; }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            padding: 50px 0;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-color: #007bff;
+        }
+
+        .icon-box {
+            width: 80px; height: 80px;
+            background: #eff6ff;
+            color: #007bff;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 25px;
+            transition: 0.3s;
+        }
+
+        .feature-card:hover .icon-box {
+            background: #007bff;
+            color: white;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            color: #1e293b;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            color: #64748b;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .arrow-icon {
+            margin-top: 20px;
+            color: #007bff;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: 0.3s;
+        }
+
+        .feature-card:hover .arrow-icon {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* --- Full Footer Styles --- */
+        .modern-footer {
+            background-color: #1e293b;
+            color: white;
+            padding: 60px 0 20px;
+            margin-top: auto;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-widget h3 {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #f8fafc;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li { margin-bottom: 12px; }
+
+        .footer-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+
+        .contact-info { list-style: none; padding: 0; }
+        .contact-info li {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: #cbd5e1;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 20px;
+        }
+
+        .copyright p { color: #94a3b8; font-size: 0.9rem; margin: 0; }
+
+        /* Auth Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; width: 100%; max-width: 400px; text-align: center; }
+        .full-width { width: 100%; padding: 10px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i> <span>HealthEase</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="features.html" class="active">Features</a></li>
+                    <li><a href="doctors.html">Doctors</a></li>
+                    <li id="adminLink" style="display: none;">
+                        <a href="admin_panel.html" style="color: #dc3545;">Admin</a>
+                    </li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons" id="authBtnContainer">
+                <button class="btn btn-primary" onclick="window.location.href='index.html'">Login</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h2>Our Premium Features</h2>
+            <p>Everything you need for better health management.</p>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="features-grid">
+            
+            <div class="feature-card" onclick="window.location.href='doctors.html'">
+                <div class="icon-box"><i class="fas fa-user-md"></i></div>
+                <h3>Expert Doctors</h3>
+                <p>Connect with top-rated specialists including Cardiologists and Dermatologists.</p>
+                <div class="arrow-icon"><i class="fas fa-arrow-right"></i> Find a Doctor</div>
+            </div>
+
+            <div class="feature-card" onclick="window.location.href='doctors.html'">
+                <div class="icon-box"><i class="fas fa-calendar-check"></i></div>
+                <h3>Instant Booking</h3>
+                <p>No more waiting in lines. Book your appointments instantly online.</p>
+                <div class="arrow-icon"><i class="fas fa-arrow-right"></i> Book Now</div>
+            </div>
+
+            <div class="feature-card" onclick="handleProtectedClick('video_consult.html')">
+                <div class="icon-box"><i class="fas fa-video"></i></div>
+                <h3>Video Consultations</h3>
+                <p>Consult with doctors from the comfort of your home via secure video calls.</p>
+                <div class="arrow-icon"><i class="fas fa-arrow-right"></i> Start Call</div>
+            </div>
+
+            <div class="feature-card" onclick="handleProtectedClick('dashboard.html')">
+                <div class="icon-box"><i class="fas fa-file-medical"></i></div>
+                <h3>Digital Records</h3>
+                <p>Access your medical history, prescriptions, and lab reports anytime securely.</p>
+                <div class="arrow-icon"><i class="fas fa-arrow-right"></i> View Records</div>
+            </div>
+
+            <div class="feature-card" onclick="document.getElementById('securityModal').style.display='flex'">
+                <div class="icon-box"><i class="fas fa-shield-alt"></i></div>
+                <h3>Secure & Private</h3>
+                <p>Your health data is encrypted and 100% private. Click to read our full security policy.</p>
+                <div class="arrow-icon"><i class="fas fa-check-circle"></i> Learn More</div>
+            </div>
+
+            <div class="feature-card" onclick="window.location.href='contact.html'">
+                <div class="icon-box"><i class="fas fa-headset"></i></div>
+                <h3>24/7 Support</h3>
+                <p>Our support team is available round the clock to assist you with any queries.</p>
+                <div class="arrow-icon"><i class="fas fa-arrow-right"></i> Contact Us</div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="modern-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-widget">
+                    <div class="footer-logo"><i class="fas fa-heartbeat"></i> HealthEase</div>
+                    <p style="color: #cbd5e1; font-size: 0.9rem;">
+                        Making quality healthcare accessible to everyone, everywhere with our advanced digital platform.
+                    </p>
+                </div>
+                <div class="footer-widget">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="doctors.html">Find a Doctor</a></li>
+                        <li><a href="dashboard.html">Patient Portal</a></li>
+                        <li><a href="contact.html">Contact Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-widget">
+                    <h3>Contact Info</h3>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Health Street, New York, NY</li>
+                        <li><i class="fas fa-phone-alt"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> support@healthease.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="copyright"><p>&copy; 2025 HealthEase. All rights reserved.</p></div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="loginPromptModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 15px; color: #1e293b;">Login Required</h3>
+            <p style="color: #64748b; margin-bottom: 20px;">You need to login to access this feature.</p>
+            <button class="btn btn-primary full-width" onclick="window.location.href='index.html'">Go to Login</button>
+            <button class="btn btn-outline full-width" onclick="document.getElementById('loginPromptModal').style.display='none'" style="margin-top: 10px;">Close</button>
+        </div>
+    </div>
+
+    <div id="securityModal" class="modal">
+        <div class="modal-content" style="max-width: 600px; text-align: left; line-height: 1.6;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div class="icon-box" style="margin: 0 auto; background: #e0f2fe; color: #0284c7;"><i class="fas fa-shield-alt"></i></div>
+                <h3 style="color: #1e293b; margin-top: 15px;">Data Security & Privacy Protocols</h3>
+            </div>
+            
+            <p style="color: #475569; margin-bottom: 15px;">
+                At HealthEase, the security of your personal health information is our absolute priority. We utilize state-of-the-art <strong>256-bit SSL encryption</strong> to ensure that every interaction, consultation, and medical record is transmitted securely across our network, making it virtually impossible for unauthorized parties to intercept your data.
+            </p>
+            <p style="color: #475569; margin-bottom: 15px;">
+                Our platform is built on a <strong>Zero-Knowledge architecture</strong>, meaning your sensitive data is encrypted in such a way that even our internal staff cannot access it without your explicit permission. We strict adherence to global healthcare compliance standards (including HIPAA guidelines) guarantees that your confidentiality is never compromised.
+            </p>
+            <p style="color: #475569; margin-bottom: 20px;">
+                Furthermore, we employ rigorous <strong>multi-factor authentication (MFA)</strong> and real-time threat monitoring to prevent unauthorized access. With HealthEase, you can consult doctors and store records with complete peace of mind, knowing your digital health footprint is shielded by the highest security protocols in the industry.
+            </p>
+
+            <button class="btn btn-primary full-width" onclick="document.getElementById('securityModal').style.display='none'">Close</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+        });
+
+        // 1. Check Auth & Update Header
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const container = document.getElementById('authBtnContainer');
+            const adminLink = document.getElementById('adminLink');
+
+            if (user) {
+                if (user.role === 'admin' && adminLink) adminLink.style.display = 'block';
+                container.innerHTML = `<button class="btn btn-outline" onclick="logout()">Logout (${user.name.split(' ')[0]})</button>`;
+            } else {
+                container.innerHTML = `<button class="btn btn-primary" onclick="window.location.href='index.html'">Login</button>`;
+            }
+        }
+
+        // 2. Protect Feature Clicks
+        function handleProtectedClick(url) {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                window.location.href = url;
+            } else {
+                document.getElementById('loginPromptModal').style.display = 'flex';
+            }
+        }
+
+        // 3. Logout
+        function logout() {
+            if(confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Close modals on outside click
+        window.onclick = function(event) {
+            const secModal = document.getElementById('securityModal');
+            const logModal = document.getElementById('loginPromptModal');
+            if (event.target == secModal) secModal.style.display = "none";
+            if (event.target == logModal) logModal.style.display = "none";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthEase - Admin Dashboard</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* --- 1. LAYOUT & STRUCTURE --- */
+        body {
+            background-color: #f5f7fa; /* Thoda soft background */
+        }
+        
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- 2. SIDEBAR --- */
+        .sidebar {
+            width: 260px;
+            background: #1e293b;
+            color: white;
+            padding: 25px 20px;
+            position: fixed;
+            height: 100%;
+            top: 0;
+            left: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-brand {
+            color: var(--primary);
+            margin-bottom: 40px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            flex-grow: 1; /* Logout ko bottom push karne ke liye */
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 8px;
+        }
+
+        .sidebar-menu a {
+            color: #94a3b8;
+            text-decoration: none;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .logout-btn {
+            color: #ef4444 !important;
+            margin-top: auto; /* Push to bottom */
+        }
+        
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.1) !important;
+        }
+
+        /* --- 3. MAIN CONTENT --- */
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 30px;
+            background: #f8f9fa;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Header Section */
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 35px;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: #1e293b;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #e2e8f0;
+        }
+
+        .admin-name {
+            font-weight: 600;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        /* --- 4. STATS CARDS --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            border-left: 5px solid;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+        }
+
+        .stat-card h3 {
+            font-size: 0.85rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-card p {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        /* Card Variations */
+        .card-blue { border-color: var(--primary); }
+        .card-green { border-color: #22c55e; }
+        .card-yellow { border-color: #eab308; }
+        .card-red { border-color: #ef4444; }
+
+        /* --- 5. TABLES & SECTIONS --- */
+        .content-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        th, td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Status Badges */
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-active { background: #dcfce7; color: #166534; }
+        .badge-pending { background: #fef9c3; color: #854d0e; }
+
+        /* Buttons Helper */
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+        
+        .action-btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* --- 6. MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            .sidebar { left: -260px; }
+            .sidebar.active { left: 0; box-shadow: 5px 0 15px rgba(0,0,0,0.1); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .menu-toggle { display: block; }
+            .admin-header { padding: 15px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .section-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .section-header button { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role !== 'admin') window.location.href = 'index.html';
+    </script>
+
+    <div class="admin-layout">
+        
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-heartbeat"></i> HealthEase
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active"><i class="fas fa-th-large"></i> Dashboard</a></li>
+                <li><a href="#doctors"><i class="fas fa-user-md"></i> Doctors</a></li>
+                <li><a href="#schedule"><i class="fas fa-calendar-alt"></i> Schedule</a></li>
+                <li><a href="appointments.html"><i class="fas fa-file-alt"></i> Reports</a></li>
+                <li><a href="#" onclick="logout()" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="admin-header">
+                <div class="header-title">
+                    <div class="menu-toggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </div>
+                    <h1>Dashboard</h1>
+                </div>
+                <div class="admin-profile">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=007bff&color=fff" class="admin-avatar" alt="Admin">
+                    <span class="admin-name">Super Admin</span>
+                </div>
+            </header>
+
+            <section class="stats-grid">
+                <div class="stat-card card-blue">
+                    <h3>Total Doctors</h3>
+                    <p>6</p>
+                </div>
+                <div class="stat-card card-green">
+                    <h3>Total Patients</h3>
+                    <p>12,450</p>
+                </div>
+                <div class="stat-card card-yellow">
+                    <h3>Appointments</h3>
+                    <p>84</p>
+                </div>
+                <div class="stat-card card-red">
+                    <h3>Revenue</h3>
+                    <p>₹45.2k</p>
+                </div>
+            </section>
+
+            <section class="content-section" id="doctors">
+                <div class="section-header">
+                    <h2>Doctor Management</h2>
+                    <button class="btn btn-primary btn-sm" onclick="alert('Add Doctor Modal')">
+                        <i class="fas fa-plus"></i> Add New Doctor
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Specialization</th>
+                                <th>Fees</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#DOC-001</td>
+                                <td>Dr. Sarah Johnson</td>
+                                <td>Cardiologist</td>
+                                <td>₹500</td>
+                                <td><span class="badge badge-active">Active</span></td>
+                                <td><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td>#DOC-002</td>
+                                <td>Dr. Mark Smith</td>
+                                <td>Dermatologist</td>
+                                <td>₹400</td>
+                                <td><span class="badge badge-active">Active</span></td>
+                                <td><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td>#DOC-003</td>
+                                <td>Dr. Vikram Singh</td>
+                                <td>Orthopedic</td>
+                                <td>₹700</td>
+                                <td><span class="badge badge-active">Active</span></td>
+                                <td><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="content-section" id="schedule">
+                <div class="section-header">
+                    <h2>Schedule Management</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Doctor</th>
+                                <th>Day</th>
+                                <th>Shift Time</th>
+                                <th>Availability</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Dr. Sarah Johnson</td>
+                                <td>Mon - Fri</td>
+                                <td>09:00 AM - 02:00 PM</td>
+                                <td><span class="badge badge-active">Available</span></td>
+                                <td><button class="btn btn-primary btn-sm">Edit Schedule</button></td>
+                            </tr>
+                            <tr>
+                                <td>Dr. Vikram Singh</td>
+                                <td>Mon, Wed, Fri</td>
+                                <td>10:00 AM - 04:00 PM</td>
+                                <td><span class="badge badge-active">Available</span></td>
+                                <td><button class="btn btn-primary btn-sm">Edit Schedule</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+            // Overlay effect ke liye content ko blur bhi kar sakte ho (Optional)
+        }
+
+        function logout() {
+            if(confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('user');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>

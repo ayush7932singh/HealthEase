@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthEase - Digital Healthcare Solution</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        body { display: flex; flex-direction: column; min-height: 100vh; }
+        footer { margin-top: auto; }
+        .loading-spinner { text-align: center; padding: 20px; color: #64748b; font-size: 1.2rem; grid-column: 1 / -1; }
+        
+        /* Highlight Admin Link */
+        .admin-nav-link {
+            color: #dc3545 !important;
+            font-weight: 700 !important;
+            border: 1px solid #dc3545;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .admin-nav-link:hover { background: #dc3545; color: white !important; }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .notification.success { background: #28a745; }
+        .notification.error { background: #dc3545; }
+        .notification.info { background: #17a2b8; }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* Form Validation Styles */
+        .input-group.error input,
+        .input-group.error select {
+            border-color: #dc3545 !important;
+        }
+        .input-group.success input,
+        .input-group.success select {
+            border-color: #28a745 !important;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: block;
+        }
+        .form-row-split {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .form-row-split .input-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        .input-group {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        .input-group i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            z-index: 1;
+        }
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        /* Features Grid - Exactly 3 cards */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-card i {
+            font-size: 2.5rem;
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .feature-card p {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>HealthEase</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="active">Home</a></li>
+                    <li><a href="features.html">Features</a></li>
+                    <li><a href="doctors.html">Doctors</a></li>
+                    
+                    <li id="adminLink" style="display: none;">
+                        <a href="admin_panel.html" class="admin-nav-link">Admin Panel</a>
+                    </li>
+                    
+                    <li id="dashboardLink" style="display: none;">
+                        <a href="dashboard.html">Dashboard</a>
+                    </li>
+
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons" id="authBtnContainer">
+                <!-- Dynamic content will be loaded here -->
+            </div>
+        </div>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="container hero-container">
+            <div class="hero-text">
+                <h1>Your Health,<br> <span>Our Priority</span></h1>
+                <p>Experience the future of healthcare. Consult top specialists, book appointments, and manage your health records—all in one secure place.</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-white" onclick="window.location.href='doctors.html'">
+                        <i class="fas fa-calendar-check"></i> Book Appointment
+                    </button>
+                    <button class="btn btn-outline-light" onclick="window.location.href='features.html'">
+                        <i class="fas fa-video"></i> Learn More
+                    </button>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item"><strong>50+</strong><span>Specialists</span></div>
+                    <div class="stat-item"><strong>10k+</strong><span>Patients</span></div>
+                    <div class="stat-item"><strong>24/7</strong><span>Support</span></div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://img.freepik.com/free-photo/portrait-smiling-handsome-male-doctor-man_171337-5055.jpg?w=740" alt="Doctor">
+                <div class="floating-card">
+                    <i class="fas fa-user-md"></i>
+                    <div><p>Expert Doctors</p><small>Online Now</small></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Our Key Features</h2>
+                <p>HealthEase combines the best of digital healthcare with AI-powered innovations</p>
+            </div>
+            <div class="features-grid" id="featuresGrid">
+                <!-- Exactly 3 features will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="doctors">
+        <div class="container">
+            <div class="section-title">
+                <h2>Our Expert Doctors</h2>
+                <p>Consult with certified healthcare professionals</p>
+            </div>
+            <div class="doctors-grid" id="featuredDoctorsGrid">
+                <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading specialists...</div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="modern-footer" id="contact">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-widget brand-widget">
+                    <div class="footer-logo"><i class="fas fa-heartbeat"></i><span>HealthEase</span></div>
+                    <p>HealthEase is a leading digital healthcare platform committed to making quality medical assistance accessible to everyone.</p>
+                </div>
+                <div class="footer-widget">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="features.html">Features</a></li>
+                        <li><a href="doctors.html">Doctors</a></li>
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                    </ul>
+                </div>
+                <div class="footer-widget">
+                    <h3>Contact Info</h3>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-map-marker-alt"></i> <span>123 Medical District, NY</span></li>
+                        <li><i class="fas fa-phone-alt"></i> <span>+1 (123) 456-7890</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="copyright"><p>&copy; 2025 HealthEase. All rights reserved.</p></div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content auth-container">
+            <span class="close-btn" onclick="closeAuthModal()">&times;</span>
+            <div class="auth-tabs">
+                <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+                <button class="tab-btn" onclick="switchTab('signup')">Create Account</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginFormSection" class="auth-section active">
+                <div class="auth-header">
+                    <h2>Welcome Back!</h2>
+                    <p>Access your health records.</p>
+                </div>
+                <form id="loginForm" onsubmit="return false;">
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="loginEmail" placeholder="Email Address" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" placeholder="Password" required>
+                    </div>
+                    <div class="error-message" id="loginError" style="display: none;"></div>
+                    <button type="submit" class="btn btn-primary full-width" id="loginBtn">Secure Login</button>
+                </form>
+                <div style="text-align: center; margin-top: 15px;">
+                    <a href="#" onclick="useDemoCredentials()" style="font-size: 0.9rem; color: #007bff;">Use Demo Account</a>
+                </div>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signupFormSection" class="auth-section">
+                <div class="auth-header">
+                    <h2>Patient Registration</h2>
+                    <p>Join us today.</p>
+                </div>
+                <form id="signupForm" onsubmit="return false;">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="signupName" placeholder="Full Name" required>
+                    </div>
+                    
+                    <div class="form-row-split">
+                        <div class="input-group">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="signupEmail" placeholder="Email" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-phone"></i>
+                            <input type="tel" id="signupPhone" placeholder="Phone" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row-split">
+                        <div class="input-group">
+                            <i class="fas fa-calendar-alt"></i>
+                            <input type="date" id="signupDob" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-venus-mars"></i>
+                            <select id="signupGender" required>
+                                <option value="">Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <input type="text" id="signupAddress" placeholder="Full Address" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="signupPassword" placeholder="Create Password (min. 6 characters)" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="signupConfirmPassword" placeholder="Confirm Password" required>
+                    </div>
+                    
+                    <div class="error-message" id="signupError" style="display: none;"></div>
+                    
+                    <button type="submit" class="btn btn-primary full-width" id="signupBtn">Register Patient</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // CONFIGURATION
+        // ==========================================
+        const API_BASE = 'http://127.0.0.1:3000/api';
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM Loaded - Initializing HealthEase');
+            checkAuth();
+            loadFeatures(); // This will now load exactly 3 features
+            fetchFeaturedDoctors();
+            
+            // Add form submit listeners
+            const loginForm = document.getElementById('loginForm');
+            if(loginForm) loginForm.addEventListener('submit', handleLogin);
+            
+            const signupForm = document.getElementById('signupForm');
+            if(signupForm) signupForm.addEventListener('submit', handleSignup);
+        });
+
+        // ==========================================
+        // NOTIFICATION SYSTEM
+        // ==========================================
+        function showNotification(message, type = 'success') {
+            // Remove existing notification
+            const existing = document.querySelector('.notification');
+            if (existing) existing.remove();
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // ==========================================
+        // AUTHENTICATION
+        // ==========================================
+        function checkAuth() {
+            const userStr = localStorage.getItem('user');
+            const token = localStorage.getItem('token');
+            const container = document.getElementById('authBtnContainer');
+            const adminLink = document.getElementById('adminLink');
+            const dashboardLink = document.getElementById('dashboardLink');
+
+            if (userStr && token) {
+                try {
+                    const user = JSON.parse(userStr);
+                    
+                    // Show Dashboard for ALL Logged-in Users
+                    if (dashboardLink) dashboardLink.style.display = 'block';
+
+                    // Show Admin Panel ONLY for Admins
+                    if (user.role === 'admin' && adminLink) {
+                        adminLink.style.display = 'block';
+                    }
+
+                    // Show Logout Button
+                    if (container) {
+                        container.innerHTML = `
+                            <span style="margin-right: 15px; color: #666;">
+                                <i class="fas fa-user-circle"></i> ${user.name.split(' ')[0]}
+                            </span>
+                            <button class="btn btn-outline" onclick="logout()">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        `;
+                    }
+                } catch (e) {
+                    console.error('Error parsing user:', e);
+                    localStorage.clear();
+                }
+            } else {
+                // Not Logged In
+                if (dashboardLink) dashboardLink.style.display = 'none';
+                if (adminLink) adminLink.style.display = 'none';
+
+                if (container) {
+                    container.innerHTML = `
+                        <button class="btn btn-outline" onclick="openAuthModal('login')">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
+                        <button class="btn btn-primary" onclick="openAuthModal('signup')">
+                            <i class="fas fa-user-plus"></i> Sign Up
+                        </button>
+                    `;
+                }
+            }
+        }
+
+        // ==========================================
+        // LOGIN HANDLER (with validation)
+        // ==========================================
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            const loginBtn = document.getElementById('loginBtn');
+            
+            // Clear previous errors
+            errorDiv.style.display = 'none';
+            errorDiv.innerHTML = '';
+            
+            // VALIDATION
+            if (!email || !password) {
+                errorDiv.innerHTML = 'Please fill in all fields';
+                errorDiv.style.display = 'block';
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                errorDiv.innerHTML = 'Please enter a valid email address';
+                errorDiv.style.display = 'block';
+                showNotification('Invalid email format', 'error');
+                return;
+            }
+            
+            // Password validation (min 6 chars)
+            if (password.length < 6) {
+                errorDiv.innerHTML = 'Password must be at least 6 characters';
+                errorDiv.style.display = 'block';
+                showNotification('Password too short', 'error');
+                return;
+            }
+
+            // Show loading
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+            loginBtn.disabled = true;
+
+            try {
+                // Try API login first
+                const res = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    showNotification('Login successful! Redirecting...', 'success');
+                    closeAuthModal();
+                    
+                    setTimeout(() => {
+                        if(data.user.role === 'admin') {
+                            window.location.href = 'admin_panel.html';
+                        } else {
+                            window.location.href = 'dashboard.html';
+                        }
+                    }, 1000);
+                } else {
+                    // Try offline login
+                    handleOfflineLogin(email, password);
+                }
+            } catch (err) {
+                console.log('API not available, using offline mode');
+                handleOfflineLogin(email, password);
+            } finally {
+                loginBtn.innerHTML = 'Secure Login';
+                loginBtn.disabled = false;
+            }
+        }
+
+        // ==========================================
+        // OFFLINE LOGIN (for demo)
+        // ==========================================
+        function handleOfflineLogin(email, password) {
+            // Demo credentials
+            if (email === 'admin@healthease.com' && password === 'admin123') {
+                const user = { 
+                    id: 999, 
+                    name: 'Admin User', 
+                    email: email, 
+                    role: 'admin' 
+                };
+                localStorage.setItem('user', JSON.stringify(user));
+                localStorage.setItem('token', 'demo-token-123');
+                showNotification('Welcome Admin!', 'success');
+                closeAuthModal();
+                setTimeout(() => window.location.href = 'admin_panel.html', 1000);
+            } 
+            else if (email === 'patient@test.com' && password === 'patient123') {
+                const user = { 
+                    id: 1, 
+                    name: 'Test Patient', 
+                    email: email, 
+                    role: 'patient' 
+                };
+                localStorage.setItem('user', JSON.stringify(user));
+                localStorage.setItem('token', 'demo-token-456');
+                showNotification('Welcome Patient!', 'success');
+                closeAuthModal();
+                setTimeout(() => window.location.href = 'dashboard.html', 1000);
+            }
+            else {
+                // Allow any login for demo
+                const name = email.split('@')[0];
+                const user = { 
+                    id: Date.now(), 
+                    name: name, 
+                    email: email, 
+                    role: 'patient' 
+                };
+                localStorage.setItem('user', JSON.stringify(user));
+                localStorage.setItem('token', 'demo-token-' + Date.now());
+                showNotification(`Welcome ${name}! (Demo Mode)`, 'success');
+                closeAuthModal();
+                setTimeout(() => window.location.href = 'dashboard.html', 1000);
+            }
+        }
+
+        // ==========================================
+        // SIGNUP HANDLER (with validation)
+        // ==========================================
+        async function handleSignup(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const phone = document.getElementById('signupPhone').value.trim();
+            const dob = document.getElementById('signupDob').value;
+            const gender = document.getElementById('signupGender').value;
+            const address = document.getElementById('signupAddress').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('signupConfirmPassword').value;
+            
+            const errorDiv = document.getElementById('signupError');
+            const signupBtn = document.getElementById('signupBtn');
+            
+            // Clear previous errors
+            errorDiv.style.display = 'none';
+            errorDiv.innerHTML = '';
+            
+            // VALIDATION
+            if (!name || !email || !phone || !dob || !gender || !address || !password || !confirmPassword) {
+                errorDiv.innerHTML = 'Please fill in all fields';
+                errorDiv.style.display = 'block';
+                showNotification('All fields are required', 'error');
+                return;
+            }
+            
+            // Name validation (min 2 chars, letters only)
+            const nameRegex = /^[a-zA-Z\s]{2,50}$/;
+            if (!nameRegex.test(name)) {
+                errorDiv.innerHTML = 'Please enter a valid name (letters only, min 2 characters)';
+                errorDiv.style.display = 'block';
+                showNotification('Invalid name format', 'error');
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                errorDiv.innerHTML = 'Please enter a valid email address';
+                errorDiv.style.display = 'block';
+                showNotification('Invalid email format', 'error');
+                return;
+            }
+            
+            // Phone validation (10 digits)
+            const phoneRegex = /^\d{10}$/;
+            if (!phoneRegex.test(phone)) {
+                errorDiv.innerHTML = 'Please enter a valid 10-digit phone number';
+                errorDiv.style.display = 'block';
+                showNotification('Invalid phone number', 'error');
+                return;
+            }
+            
+            // Age validation (must be at least 18)
+            const birthDate = new Date(dob);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            if (age < 18) {
+                errorDiv.innerHTML = 'You must be at least 18 years old to register';
+                errorDiv.style.display = 'block';
+                showNotification('Age must be 18+', 'error');
+                return;
+            }
+            
+            // Password validation (min 6 chars, at least 1 number and 1 special char)
+            const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,}$/;
+            if (password.length < 6) {
+                errorDiv.innerHTML = 'Password must be at least 6 characters';
+                errorDiv.style.display = 'block';
+                showNotification('Password too short', 'error');
+                return;
+            }
+            if (!/[0-9]/.test(password)) {
+                errorDiv.innerHTML = 'Password must contain at least one number';
+                errorDiv.style.display = 'block';
+                showNotification('Password must contain a number', 'error');
+                return;
+            }
+            if (!/[!@#$%^&*]/.test(password)) {
+                errorDiv.innerHTML = 'Password must contain at least one special character (!@#$%^&*)';
+                errorDiv.style.display = 'block';
+                showNotification('Password needs a special character', 'error');
+                return;
+            }
+            
+            // Confirm password
+            if (password !== confirmPassword) {
+                errorDiv.innerHTML = 'Passwords do not match';
+                errorDiv.style.display = 'block';
+                showNotification('Passwords do not match', 'error');
+                return;
+            }
+
+            // Show loading
+            signupBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
+            signupBtn.disabled = true;
+
+            const payload = {
+                name: name,
+                email: email,
+                phone: phone,
+                dob: dob,
+                gender: gender,
+                address: address,
+                password: password,
+                role: 'patient'
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (res.ok) {
+                    showNotification('Registration successful! Please login.', 'success');
+                    
+                    // Clear form
+                    document.getElementById('signupForm').reset();
+                    
+                    // Switch to login tab
+                    setTimeout(() => {
+                        switchTab('login');
+                    }, 1500);
+                } else {
+                    const data = await res.json();
+                    errorDiv.innerHTML = data.message || 'Registration failed';
+                    errorDiv.style.display = 'block';
+                    showNotification(data.message || 'Registration failed', 'error');
+                }
+            } catch (err) {
+                // Offline mode - store in localStorage
+                const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+                
+                // Check if email exists
+                if (users.some(u => u.email === email)) {
+                    errorDiv.innerHTML = 'Email already registered';
+                    errorDiv.style.display = 'block';
+                    showNotification('Email already registered', 'error');
+                } else {
+                    const newUser = { id: users.length + 1, ...payload };
+                    users.push(newUser);
+                    localStorage.setItem('registeredUsers', JSON.stringify(users));
+                    
+                    showNotification('Registration successful! (Offline Mode)', 'success');
+                    
+                    // Clear form and switch to login
+                    document.getElementById('signupForm').reset();
+                    setTimeout(() => switchTab('login'), 1500);
+                }
+            } finally {
+                signupBtn.innerHTML = 'Register Patient';
+                signupBtn.disabled = false;
+            }
+        }
+
+        // ==========================================
+        // DEMO CREDENTIALS
+        // ==========================================
+        function useDemoCredentials() {
+            document.getElementById('loginEmail').value = 'patient@test.com';
+            document.getElementById('loginPassword').value = 'patient123';
+            showNotification('Demo credentials filled! Click Login', 'info');
+        }
+
+        // ==========================================
+        // LOGOUT
+        // ==========================================
+        function logout() {
+            if(confirm('Are you sure you want to logout?')) {
+                localStorage.clear();
+                showNotification('Logged out successfully', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            }
+        }
+
+        // ==========================================
+        // DATA LOADING - EXACTLY 3 FEATURES
+        // ==========================================
+        function loadFeatures() {
+            const grid = document.getElementById('featuresGrid');
+            if(!grid) return;
+            
+            // Exactly 3 features for homepage
+            grid.innerHTML = `
+                <div class="feature-card">
+                    <i class="fas fa-user-md"></i>
+                    <h3>Expert Doctors</h3>
+                    <p>Access to 50+ certified specialists across 20+ medical fields, available for consultation.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-calendar-check"></i>
+                    <h3>Easy Booking</h3>
+                    <p>Book appointments 24/7 with real-time availability tracking and instant confirmation.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-file-medical-alt"></i>
+                    <h3>Digital Records</h3>
+                    <p>Securely store and access your medical history, prescriptions, and lab reports online.</p>
+                </div>
+            `;
+        }
+
+        async function fetchFeaturedDoctors() {
+            const grid = document.getElementById('featuredDoctorsGrid');
+            if(!grid) return;
+            
+            try {
+                const res = await fetch(`${API_BASE}/doctors`);
+                const data = await res.json();
+                
+                if (data.doctors && data.doctors.length > 0) {
+                    const top3 = data.doctors.slice(0, 3);
+                    grid.innerHTML = top3.map(doc => `
+                        <div style="background:white; padding:20px; border-radius:12px; text-align:center; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+                            <img src="${doc.image}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom:15px;" 
+                                 onerror="this.src='https://ui-avatars.com/api/?name=${doc.name}&background=007bff&color=fff&size=80'">
+                            <h3 style="font-size:1.1rem; color:#1e293b; margin-bottom:5px;">${doc.name}</h3>
+                            <p style="color:#007bff; font-size:0.9rem; margin-bottom:5px;">${doc.specialization}</p>
+                            <p style="color:#666; font-size:0.9rem;">⭐ ${doc.rating || 4.5} | ${doc.experience || 10}+ years</p>
+                        </div>
+                    `).join('');
+                } else {
+                    grid.innerHTML = '<p style="text-align:center; grid-column:1/-1;">No doctors found.</p>';
+                }
+            } catch (e) {
+                console.log('Using offline doctor data');
+                // Fallback doctors - exactly 3
+                const offlineDoctors = [
+                    { name: 'Dr. Sarah Johnson', specialization: 'Cardiologist', rating: 4.9, experience: 15 },
+                    { name: 'Dr. Michael Chen', specialization: 'Neurologist', rating: 4.8, experience: 12 },
+                    { name: 'Dr. Emily Davis', specialization: 'Pediatrician', rating: 4.7, experience: 10 }
+                ];
+                
+                grid.innerHTML = offlineDoctors.map(doc => `
+                    <div style="background:white; padding:20px; border-radius:12px; text-align:center; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+                        <img src="https://ui-avatars.com/api/?name=${doc.name}&background=007bff&color=fff&size=80" style="width:80px; height:80px; border-radius:50%; margin-bottom:15px;">
+                        <h3 style="font-size:1.1rem; color:#1e293b; margin-bottom:5px;">${doc.name}</h3>
+                        <p style="color:#007bff; font-size:0.9rem; margin-bottom:5px;">${doc.specialization}</p>
+                        <p style="color:#666; font-size:0.9rem;">⭐ ${doc.rating} | ${doc.experience}+ years</p>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // ==========================================
+        // MODAL FUNCTIONS
+        // ==========================================
+        function openAuthModal(tab = 'login') {
+            const modal = document.getElementById('authModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                switchTab(tab);
+            }
+        }
+        
+        function closeAuthModal() {
+            const modal = document.getElementById('authModal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                
+                // Clear any error messages
+                document.getElementById('loginError').style.display = 'none';
+                document.getElementById('signupError').style.display = 'none';
+            }
+        }
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.auth-section').forEach(s => s.classList.remove('active'));
+            
+            if (tab === 'login') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('loginFormSection').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('signupFormSection').classList.add('active');
+            }
+        }
+
+        // ==========================================
+        // EVENT LISTENERS
+        // ==========================================
+        window.onclick = function(e) { 
+            if (e.target == document.getElementById('authModal')) {
+                closeAuthModal(); 
+            }
+        }
+
+        // Export functions to global scope
+        window.openAuthModal = openAuthModal;
+        window.closeAuthModal = closeAuthModal;
+        window.switchTab = switchTab;
+        window.logout = logout;
+        window.useDemoCredentials = useDemoCredentials;
+    </script>
+</body>
+</html>

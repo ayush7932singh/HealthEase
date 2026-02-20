@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthEase - Patient Dashboard</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #2E8BFF;
+            --primary-dark: #1a6ed9;
+            --secondary: #1A2B49;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --light: #f8f9fa;
+            --dark-blue: #0d1b33;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            color: var(--secondary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Modern Navigation */
+        header {
+            background: white;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo i {
+            color: var(--primary);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--secondary);
+            font-weight: 500;
+            transition: 0.3s;
+            font-size: 0.95rem;
+            padding: 8px 0;
+            position: relative;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--primary);
+        }
+
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-name {
+            font-weight: 500;
+            color: var(--secondary);
+            background: var(--light);
+            padding: 8px 15px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-name i {
+            color: var(--primary);
+        }
+
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            background: #b22a37;
+            transform: scale(1.05);
+        }
+
+        /* Dashboard Content */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+            flex: 1;
+        }
+
+        .greeting-section {
+            margin-bottom: 30px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .greeting-section h2 {
+            font-size: 2rem;
+            color: var(--dark-blue);
+            margin-bottom: 10px;
+        }
+
+        .greeting-section p {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: 0.3s ease;
+            border-bottom: 4px solid transparent;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(46, 139, 255, 0.03));
+            pointer-events: none;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            border-bottom: 4px solid var(--primary);
+            box-shadow: 0 15px 30px rgba(46, 139, 255, 0.15);
+        }
+
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(46, 139, 255, 0.1);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            transition: 0.3s;
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1);
+            background: var(--primary);
+            color: white;
+        }
+
+        .stat-info h4 {
+            font-size: 0.9rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .stat-info p {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--secondary);
+            line-height: 1.2;
+        }
+
+        /* Action Section */
+        .quick-actions {
+            margin-top: 40px;
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .quick-actions h3 {
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            color: var(--dark-blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quick-actions h3 i {
+            color: var(--primary);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 30px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: 0.3s;
+            font-size: 1rem;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-primary { 
+            background: var(--primary); 
+            color: white; 
+            box-shadow: 0 5px 15px rgba(46, 139, 255, 0.3);
+        }
+        
+        .btn-outline { 
+            border: 2px solid var(--primary); 
+            color: var(--primary); 
+            background: transparent; 
+        }
+        
+        .btn:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 8px 20px rgba(46, 139, 255, 0.4);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline:hover {
+            background: rgba(46, 139, 255, 0.05);
+        }
+
+        /* Appointments Section */
+        .appointments-section {
+            margin-top: 40px;
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .appointments-section h3 {
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            color: var(--dark-blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .appointment-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid var(--light-gray);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            transition: 0.3s;
+        }
+
+        .appointment-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .appointment-info {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .appointment-date {
+            text-align: center;
+            background: var(--light);
+            padding: 10px 20px;
+            border-radius: 10px;
+            min-width: 100px;
+        }
+
+        .appointment-date .day {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .appointment-date .month {
+            font-size: 0.9rem;
+            color: var(--gray);
+            text-transform: uppercase;
+        }
+
+        .appointment-details h4 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            color: var(--secondary);
+        }
+
+        .appointment-details p {
+            color: var(--gray);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .appointment-details p i {
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        .appointment-status {
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .status-upcoming {
+            background: rgba(46, 139, 255, 0.1);
+            color: var(--primary);
+        }
+
+        .status-completed {
+            background: rgba(40, 199, 111, 0.1);
+            color: var(--success);
+        }
+
+        .status-cancelled {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+        }
+
+        .no-appointments {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+
+        .no-appointments i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--light-gray);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(40, 167, 69, 0.2);
+        }
+
+        .alert-danger {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(220, 53, 69, 0.2);
+        }
+
+        footer {
+            background: var(--dark-blue);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        footer p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        /* Responsive Design */
+        @media(max-width: 992px) {
+            .dashboard-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width: 768px) {
+            header { 
+                flex-direction: column; 
+                text-align: center; 
+                gap: 15px; 
+                padding: 15px 20px;
+            }
+            
+            nav ul { 
+                gap: 20px; 
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .user-info {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .greeting-section h2 {
+                font-size: 1.5rem;
+            }
+
+            .btn-group { 
+                flex-direction: column; 
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .appointment-card {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .appointment-info {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width: 480px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .greeting-section {
+                padding: 20px;
+            }
+
+            .stat-card {
+                padding: 20px;
+            }
+
+            .stat-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+
+            .stat-info p {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo" onclick="location.href='index.html'">
+        <i class="fas fa-heartbeat"></i> 
+        <span>HealthEase</span>
+    </div>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="doctors.html">Doctors</a></li>
+            <li><a href="dashboard.html" class="active">Dashboard</a></li>
+            <li><a href="appointments.html">Appointments</a></li>
+        </ul>
+    </nav>
+    <div class="user-info">
+        <span class="user-name" id="userNameDisplay">
+            <i class="fas fa-user-circle"></i>
+            <span id="userName">Guest</span>
+        </span>
+        <button class="logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+    </div>
+</header>
+
+<div class="container">
+    <!-- Alert Container -->
+    <div id="alertContainer"></div>
+
+    <div class="greeting-section">
+        <h2 id="greeting">Welcome to HealthEase! 👋</h2>
+        <p id="greetingMessage">Here is your health summary for today.</p>
+    </div>
+
+    <div class="dashboard-stats">
+        <div class="stat-card" onclick="location.href='appointments.html'">
+            <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+            <div class="stat-info">
+                <h4>Total Appointments</h4>
+                <p id="appointments">0</p>
+            </div>
+        </div>
+
+        <div class="stat-card" onclick="showPrescriptions()">
+            <div class="stat-icon" style="color: #ff9f43; background: rgba(255,159,67,0.1);"><i class="fas fa-file-prescription"></i></div>
+            <div class="stat-info">
+                <h4>Upcoming</h4>
+                <p id="upcoming">0</p>
+            </div>
+        </div>
+
+        <div class="stat-card" onclick="showReports()">
+            <div class="stat-icon" style="color: #28c76f; background: rgba(40,199,111,0.1);"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-info">
+                <h4>Completed</h4>
+                <p id="completed">0</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="location.href='doctors.html'">
+                <i class="fas fa-plus"></i> Book New Appointment
+            </button>
+            <button class="btn btn-outline" onclick="downloadReport()" id="downloadBtn">
+                <i class="fas fa-download"></i> Download Recent Reports
+            </button>
+            <button class="btn btn-outline" onclick="refreshDashboard()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2025 HealthEase | Secure Patient Portal | Version 2.0</p>
+    <p style="margin-top: 10px; font-size: 0.8rem;">Your health, our priority ❤️</p>
+</footer>
+
+<script>
+
+// ==========================================
+// DASHBOARD JAVASCRIPT - CLEAN & REAL SYNC
+// ==========================================
+
+const API_BASE = 'http://127.0.0.1:3000/api'; 
+
+document.addEventListener("DOMContentLoaded", function() {
+    checkAuth();
+    loadUserData();
+    loadDashboardStats();
+    loadRecentAppointments();
+});
+
+function checkAuth() {
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    if (!token || !user.name) {
+        window.location.href = "index.html";
+        return;
+    }
+}
+
+function loadUserData() {
+    try {
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        const patientName = user.name || "Guest User";
+        document.getElementById("userName").textContent = patientName;
+        
+        let hour = new Date().getHours();
+        let greetingText = hour < 12 ? "Good Morning" : (hour < 18 ? "Good Afternoon" : "Good Evening");
+        document.getElementById("greeting").innerHTML = `${greetingText}, ${patientName}! 👋`;
+    } catch (error) {
+        console.error("User data load error");
+    }
+}
+
+// Statistics Fetching Logic
+async function loadDashboardStats() {
+    const token = localStorage.getItem("token");
+    try {
+        const res = await fetch(`${API_BASE}/dashboard/stats`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        document.getElementById("appointments").textContent = data.upcomingAppointments || "0";
+        document.getElementById("upcoming").textContent = data.upcomingAppointments || "0";
+        document.getElementById("completed").textContent = data.labReports || "0";
+    } catch (err) {
+        console.log("Stats update skipped");
+    }
+}
+
+// Recent Appointments Fetching Logic
+async function loadRecentAppointments() {
+    const container = document.getElementById("recentAppointments");
+    const token = localStorage.getItem("token");
+
+    try {
+        const res = await fetch(`${API_BASE}/appointments`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        const appointments = data.appointments || [];
+
+        if (appointments.length === 0) {
+            container.innerHTML = `
+                <div class="no-appointments">
+                    <i class="fas fa-calendar-times"></i>
+                    <p>No appointments found in database.</p>
+                    <button class="btn btn-primary" style="margin-top: 15px;" onclick="location.href='doctors.html'">
+                        Book Your First Appointment
+                    </button>
+                </div>`;
+            return;
+        }
+
+        let html = '';
+        appointments.forEach(apt => {
+            const dateParts = apt.date.split('-');
+            const day = dateParts[2] || '??';
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const month = monthNames[parseInt(dateParts[1]) - 1] || 'Month';
+            
+            html += `
+                <div class="appointment-card">
+                    <div class="appointment-info">
+                        <div class="appointment-date">
+                            <div class="day">${day}</div>
+                            <div class="month">${month}</div>
+                        </div>
+                        <div class="appointment-details">
+                            <h4>${apt.doctorName}</h4>
+                            <p><i class="fas fa-stethoscope"></i> ${apt.symptoms || 'General Checkup'}</p>
+                            <p><i class="fas fa-clock"></i> ${apt.time}</p>
+                        </div>
+                    </div>
+                    <span class="appointment-status status-upcoming">${apt.status.toUpperCase()}</span>
+                </div>`;
+        });
+        container.innerHTML = html;
+    } catch (error) {
+        container.innerHTML = `<div class="no-appointments"><p>Unable to load list.</p></div>`;
+    }
+}
+
+function refreshDashboard() {
+    const refreshBtn = event?.currentTarget;
+    if(refreshBtn) refreshBtn.disabled = true;
+    loadDashboardStats();
+    loadRecentAppointments();
+    setTimeout(() => { if(refreshBtn) refreshBtn.disabled = false; }, 1000);
+}
+
+function logout() {
+    if(confirm("Logout?")) {
+        localStorage.clear();
+        window.location.href = "index.html";
+    }
+}
+
+function showAlert(message, type = "success") {
+    const alertContainer = document.getElementById("alertContainer");
+    alertContainer.innerHTML = `<div class="alert alert-${type}"><span>${message}</span></div>`;
+    setTimeout(() => { alertContainer.innerHTML = ''; }, 3000);
+}
+</script>
+
+</body>
+</html>

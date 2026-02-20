@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthEase - Payment Receipt</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* --- Receipt Specific Styles --- */
+        body { background-color: #f4f7f6; }
+        
+        .receipt-container { 
+            max-width: 600px; margin: 50px auto; 
+            background: white; padding: 40px; 
+            border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            position: relative; overflow: hidden; 
+        }
+        
+        .receipt-header { 
+            text-align: center; border-bottom: 2px dashed #eee; 
+            padding-bottom: 20px; margin-bottom: 20px; 
+        }
+        
+        .receipt-header h1 { font-size: 1.8rem; color: #007bff; margin-bottom: 5px; }
+        .receipt-header p { color: #64748b; font-size: 0.9rem; }
+        
+        .receipt-body { margin-bottom: 20px; }
+        
+        .receipt-row { 
+            display: flex; justify-content: space-between; 
+            margin-bottom: 12px; font-size: 0.95rem; 
+        }
+        
+        .receipt-label { color: #666; font-weight: 500; }
+        .receipt-value { color: #333; font-weight: 600; text-align: right; }
+        
+        .total-row { 
+            border-top: 2px solid #eee; padding-top: 15px; 
+            margin-top: 15px; font-size: 1.2rem; color: #007bff; 
+        }
+        
+        .status-stamp { 
+            position: absolute; top: 100px; right: 40px; 
+            border: 3px solid #28a745; color: #28a745; 
+            padding: 5px 15px; font-weight: 700; text-transform: uppercase; 
+            transform: rotate(-15deg); opacity: 0.2; font-size: 1.5rem; 
+            border-radius: 5px; pointer-events: none;
+        }
+        
+        .receipt-actions { 
+            display: flex; gap: 15px; justify-content: center; margin-top: 30px; 
+        }
+        
+        @media print { 
+            header, .receipt-actions { display: none; } 
+            body { background: white; } 
+            .receipt-container { box-shadow: none; margin: 0; border: 1px solid #eee; } 
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i> <span>HealthEase</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="receipt-container">
+            <div class="status-stamp">PAID</div>
+            
+            <div class="receipt-header">
+                <i class="fas fa-check-circle" style="font-size: 3rem; color: #28a745; margin-bottom: 15px;"></i>
+                <h1>Payment Successful</h1>
+                <p>Transaction ID: <span id="rcptTxn">#TXN-Loading...</span></p>
+            </div>
+
+            <div class="receipt-body">
+                <div class="receipt-row">
+                    <span class="receipt-label">Patient Name</span>
+                    <span class="receipt-value" id="rcptName">Guest</span>
+                </div>
+                <div class="receipt-row">
+                    <span class="receipt-label">Doctor</span>
+                    <span class="receipt-value" id="rcptDoctor">General Physician</span>
+                </div>
+                <div class="receipt-row">
+                    <span class="receipt-label">Date</span>
+                    <span class="receipt-value" id="rcptDate">--/--/----</span>
+                </div>
+                <div class="receipt-row">
+                    <span class="receipt-label">Payment Method</span>
+                    <span class="receipt-value">Credit Card</span>
+                </div>
+                <div class="receipt-row total-row">
+                    <span class="receipt-label">Amount Paid</span>
+                    <span class="receipt-value">₹649.00</span>
+                </div>
+            </div>
+
+            <div class="receipt-actions">
+                <button class="btn btn-outline" onclick="window.print()">
+                    <i class="fas fa-print"></i> Print
+                </button>
+                <button class="btn btn-primary" onclick="handleDashboardRedirect()">
+                    Go to Dashboard
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadReceiptDetails();
+        });
+
+        // 1. Auth Check
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // 2. Load Details from LocalStorage
+        function loadReceiptDetails() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            // Get mock details (saved from previous pages or defaults)
+            const date = localStorage.getItem('tempAppointmentDate') || new Date().toLocaleDateString();
+            const doctor = localStorage.getItem('tempDoctorName') || 'Specialist Doctor';
+            
+            // Generate Random Transaction ID for realism
+            const txnId = 'TXN-' + Math.floor(10000000 + Math.random() * 90000000);
+
+            if(user) document.getElementById('rcptName').innerText = user.name;
+            document.getElementById('rcptDate').innerText = date;
+            document.getElementById('rcptDoctor').innerText = doctor;
+            document.getElementById('rcptTxn').innerText = txnId;
+        }
+
+        // 3. Redirect Logic
+        function handleDashboardRedirect() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user && user.role === 'admin') {
+                window.location.href = 'admin_panel.html';
+            } else {
+                window.location.href = 'dashboard.html';
+            }
+        }
+    </script>
+</body>
+</html>

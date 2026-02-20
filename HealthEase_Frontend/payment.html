@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthEase - Secure Payment</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* --- Payment Page Specific Styles --- */
+        body { background-color: #f4f7f6; }
+
+        .payment-container {
+            max-width: 900px; margin: 50px auto; padding: 20px;
+            display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px;
+        }
+
+        .summary-card, .payment-card {
+            background: white; padding: 30px; border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .summary-header, .payment-header {
+            border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px;
+        }
+
+        .summary-item {
+            display: flex; justify-content: space-between; margin-bottom: 15px; color: #555;
+        }
+
+        .summary-total {
+            display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px;
+            border-top: 2px dashed #eee; font-weight: 700; font-size: 1.2rem; color: #007bff;
+        }
+
+        .card-icons {
+            margin: 15px 0; font-size: 24px; color: #666;
+            display: flex; gap: 15px;
+        }
+
+        .form-row-split {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+        }
+        
+        /* Processing Overlay */
+        .processing-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 1000; visibility: hidden; opacity: 0; transition: opacity 0.3s;
+        }
+        .processing-overlay.active { visibility: visible; opacity: 1; }
+
+        .spinner {
+            width: 50px; height: 50px; border: 5px solid #f3f3f3;
+            border-top: 5px solid #007bff; border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+
+        .success-checkmark {
+            color: #28a745; font-size: 80px; margin-bottom: 20px; display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .payment-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header style="background: white; padding: 20px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="logo" style="font-size: 24px; font-weight: 700; color: #333;">
+                <i class="fas fa-heartbeat" style="color: #007bff;"></i> HealthEase
+            </div>
+            <a href="doctors.html" style="text-decoration: none; color: #555;"><i class="fas fa-arrow-left"></i> Cancel</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="payment-container">
+            
+            <div class="summary-card">
+                <div class="summary-header">
+                    <h3>Appointment Summary</h3>
+                </div>
+                <div class="summary-item">
+                    <span>Consultation Fee</span>
+                    <span>₹500.00</span>
+                </div>
+                <div class="summary-item">
+                    <span>Service Charge</span>
+                    <span>₹50.00</span>
+                </div>
+                <div class="summary-item">
+                    <span>GST (18%)</span>
+                    <span>₹99.00</span>
+                </div>
+                <div class="summary-total">
+                    <span>Total to Pay</span>
+                    <span>₹649.00</span>
+                </div>
+                
+                <div style="margin-top: 30px; background: #eef2ff; padding: 15px; border-radius: 8px;">
+                    <h4 style="margin-bottom: 10px; font-size: 0.9rem; color: #555;">Patient Details</h4>
+                    <p style="font-size: 0.9rem; margin-bottom: 5px;"><i class="fas fa-user"></i> <span id="summaryName">Loading...</span></p>
+                    <p style="font-size: 0.9rem; margin-bottom: 5px;"><i class="fas fa-calendar"></i> <span id="summaryDate">Loading...</span></p>
+                    <p style="font-size: 0.9rem; color: #007bff;"><i class="fas fa-user-md"></i> <span id="summaryDoctor">Loading...</span></p>
+                </div>
+            </div>
+
+            <div class="payment-card">
+                <div class="payment-header">
+                    <h3>Payment Details</h3>
+                </div>
+                
+                <div class="card-icons">
+                    <i class="fab fa-cc-visa" style="color: #1a1f71;"></i>
+                    <i class="fab fa-cc-mastercard" style="color: #eb001b;"></i>
+                    <i class="fab fa-google-pay" style="color: #000;"></i>
+                    <i class="fas fa-rupee-sign" style="color: #28a745;"></i>
+                </div>
+
+                <form id="paymentForm">
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Cardholder Name</label>
+                        <input type="text" class="form-control" id="cardName" placeholder="Name as on card" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px;">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Card Number</label>
+                        <div style="position: relative;">
+                            <input type="text" class="form-control" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px;">
+                            <i class="fas fa-credit-card" style="position: absolute; right: 15px; top: 15px; color: #ccc;"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-row-split">
+                        <div class="form-group">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Expiry Date</label>
+                            <input type="text" class="form-control" id="cardExpiry" placeholder="MM/YY" maxlength="5" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px;">
+                        </div>
+                        <div class="form-group">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">CVV / PIN</label>
+                            <input type="password" class="form-control" id="cardCvv" placeholder="123" maxlength="3" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px;">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 30px; padding: 15px; background: #007bff; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s;">
+                        Pay ₹649.00
+                    </button>
+                    
+                    <p style="text-align: center; margin-top: 15px; font-size: 0.85rem; color: #888;">
+                        <i class="fas fa-lock"></i> Your transaction is secured with 256-bit SSL encryption.
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="processing-overlay" id="processingOverlay">
+        <div class="spinner" id="spinner"></div>
+        <h2 id="statusText">Processing Payment...</h2>
+        <p id="subText">Please do not close this window.</p>
+        
+        <div class="success-checkmark" id="successCheck">
+            <i class="fas fa-check-circle"></i>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:3000/api';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadBookingDetails();
+            setupValidation();
+        });
+
+        // 1. Check Login
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                alert("Please login first.");
+                window.location.href = 'index.html';
+            } else {
+                document.getElementById('summaryName').innerText = user.name;
+            }
+        }
+
+        // 2. Load Data from Doctors Page
+        function loadBookingDetails() {
+            const apptDataString = localStorage.getItem('tempAppointmentData');
+            
+            if (!apptDataString) {
+                alert("No booking data found! Please select a doctor and time first.");
+                window.location.href = 'doctors.html';
+                return;
+            }
+
+            const apptData = JSON.parse(apptDataString);
+            document.getElementById('summaryDate').innerText = `${apptData.date} at ${apptData.time}`;
+            document.getElementById('summaryDoctor').innerText = apptData.doctorName || "Doctor";
+        }
+
+        // 3. UI Auto-Formatting (Spaces, slashes)
+        function setupValidation() {
+            const cardNumber = document.getElementById('cardNumber');
+            const cardExpiry = document.getElementById('cardExpiry');
+            const cardCvv = document.getElementById('cardCvv');
+
+            // Format Card Number
+            cardNumber.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '').substring(0, 16);
+                e.target.value = value.match(/.{1,4}/g)?.join(' ') || value;
+            });
+
+            // Format Expiry Date
+            cardExpiry.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 2) value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                e.target.value = value;
+            });
+
+            // Format CVV
+            cardCvv.addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/\D/g, '');
+            });
+        }
+
+        // 4. 🔥 STRICT VALIDATION & PAYMENT SUBMIT
+        document.getElementById('paymentForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); 
+
+            // --- GET VALUES ---
+            const cardName = document.getElementById('cardName').value.trim();
+            const cardNum = document.getElementById('cardNumber').value.replace(/\s/g, '');
+            const expiry = document.getElementById('cardExpiry').value;
+            const cvv = document.getElementById('cardCvv').value;
+
+            // --- 🛑 CONDITIONS CHECK (VALIDATION) ---
+            
+            // 1. Name Check
+            if(cardName.length < 3) {
+                alert("Please enter a valid Cardholder Name.");
+                return;
+            }
+
+            // 2. Card Number Check
+            if(cardNum.length !== 16 || isNaN(cardNum)) { 
+                alert("Invalid Card Number. It must be exactly 16 digits."); 
+                return; 
+            }
+
+            // 3. Expiry Date Check
+            if(!expiry.includes('/')) {
+                alert("Invalid Expiry Date. Please use MM/YY format.");
+                return;
+            }
+            
+            const [mm, yy] = expiry.split('/');
+            const currentYear = new Date().getFullYear() % 100; // Example: 26 for 2026
+            const currentMonth = new Date().getMonth() + 1; // 1 to 12
+            
+            const monthNum = parseInt(mm, 10);
+            const yearNum = parseInt(yy, 10);
+
+            if(monthNum < 1 || monthNum > 12) {
+                alert("Invalid Expiry Month. It must be between 01 and 12.");
+                return;
+            }
+
+            if(yearNum < currentYear || (yearNum === currentYear && monthNum < currentMonth)) {
+                alert("This card has expired. Please use a valid card.");
+                return;
+            }
+
+            // 4. CVV/PIN Check
+            if(cvv.length !== 3 || isNaN(cvv)) {
+                alert("Invalid CVV / PIN. It must be exactly 3 digits.");
+                return;
+            }
+
+            // --- ✅ ALL CHECKS PASSED, PROCEED TO PAY ---
+
+            // Show Processing UI
+            const overlay = document.getElementById('processingOverlay');
+            overlay.classList.add('active');
+
+            // Data Prepare
+            const apptData = JSON.parse(localStorage.getItem('tempAppointmentData'));
+            const token = localStorage.getItem('token');
+
+            if (!apptData || !token) {
+                alert("Session Error. Please try again.");
+                window.location.href = 'doctors.html';
+                return;
+            }
+
+            try {
+                // Call Backend API
+                const res = await fetch(`${API_BASE}/appointments`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(apptData)
+                });
+
+                if (res.ok) {
+                    // Success!
+                    setTimeout(() => {
+                        document.getElementById('spinner').style.display = 'none';
+                        document.getElementById('successCheck').style.display = 'block';
+                        document.getElementById('statusText').innerText = 'Payment Successful!';
+                        document.getElementById('subText').innerText = 'Booking Confirmed!';
+
+                        // Clear temporary data
+                        localStorage.removeItem('tempAppointmentData');
+                        localStorage.removeItem('tempDoctorName');
+                        localStorage.removeItem('tempAppointmentDate');
+
+                        // Go to Dashboard
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.html'; 
+                        }, 2000);
+                    }, 2000); 
+                } else {
+                    const errData = await res.json();
+                    throw new Error(errData.message || "Server Error");
+                }
+
+            } catch(err) {
+                overlay.classList.remove('active');
+                alert("Booking Failed: " + err.message);
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>
