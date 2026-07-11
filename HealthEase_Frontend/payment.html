@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
     
     <style>
         /* --- Payment Page Specific Styles --- */
@@ -19,7 +20,7 @@
         }
 
         .summary-card, .payment-card {
-            background: white; padding: 30px; border-radius: 15px;
+            background: var(--bg-secondary); padding: 30px; border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
         }
 
@@ -37,7 +38,7 @@
         }
 
         .card-icons {
-            margin: 15px 0; font-size: 24px; color: #666;
+            margin: 15px 0; font-size: 24px; color: var(--text-muted);
             display: flex; gap: 15px;
         }
 
@@ -75,10 +76,11 @@
     </style>
 </head>
 <body>
+    <div class="blob-container"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
 
-    <header style="background: white; padding: 20px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+    <header style="background: var(--bg-secondary); padding: 20px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
         <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
-            <div class="logo" style="font-size: 24px; font-weight: 700; color: #333;">
+            <div class="logo" style="font-size: 24px; font-weight: 700; color: var(--text-primary);">
                 <i class="fas fa-heartbeat" style="color: #007bff;"></i> HealthEase
             </div>
             <a href="doctors.html" style="text-decoration: none; color: #555;"><i class="fas fa-arrow-left"></i> Cancel</a>
@@ -177,7 +179,7 @@
     </div>
 
     <script>
-        const API_BASE = 'http://127.0.0.1:3000/api';
+        const API_BASE = '/api';
 
         document.addEventListener('DOMContentLoaded', () => {
             checkAuth();

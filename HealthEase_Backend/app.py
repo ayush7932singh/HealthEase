@@ -1,30 +1,43 @@
 import os
 import jwt
 import datetime
-import urllib.parse  # Added for safe password encoding
+import urllib.parse
 from functools import wraps
-from flask import Flask, jsonify, request, render_template # Added render_template
+from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
+from dotenv import load_dotenv
 
-# --- App Setup (UPDATED) ---
-# We tell Flask that templates (HTML) and static files (CSS/JS) 
-# are in the sibling folder 'HealthEase_Frontend'
+load_dotenv()  # Load .env file locally
+
+# --- App Setup ---
 app = Flask(__name__, 
             template_folder='../HealthEase_Frontend',
             static_folder='../HealthEase_Frontend',
             static_url_path='')
 
 # --- Database Configuration ---
-# Handling the '@' in your password "Singh@2004" safely
-db_password = urllib.parse.quote_plus("Singh@2004")
-app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://root:{db_password}@localhost/healthease'
+# Uses DATABASE_URL from Render/Railway env variable, falls back to local MySQL
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    # Railway provides mysql:// — convert to pymysql driver
+    if DATABASE_URL.startswith('mysql://'):
+        DATABASE_URL = DATABASE_URL.replace('mysql://', 'mysql+pymysql://', 1)
+    # Render provides postgres:// — convert to postgresql:// driver
+    elif DATABASE_URL.startswith('postgres://'):
+        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+else:
+    # Local fallback
+    db_password = urllib.parse.quote_plus("Singh@2004")
+    DATABASE_URL = f'mysql+pymysql://root:{db_password}@localhost/healthease'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'your-super-secret-and-complex-key-12345'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-super-secret-and-complex-key-12345')
 
 db = SQLAlchemy(app)
-CORS(app) # Enables CORS for all routes
+CORS(app)
 
 # --- Models ---
 class User(db.Model):
@@ -140,8 +153,6 @@ def login():
     email = data.get('email')
     password = data.get('password')
     
-    print(f"Login attempt: {email}") # Debug log
-
     user = User.query.filter_by(email=email).first()
 
     if not user or not check_password_hash(user.password_hash, password):
@@ -271,22 +282,45 @@ def book_appointment(current_user):
 
     return jsonify({'success': True, 'message': 'Appointment booked successfully'})
 
+# 7b. Get Appointments (Patient's own)
+@app.route('/api/appointments', methods=['GET'])
+@token_required
+def get_appointments(current_user):
+    appointments = Appointment.query.filter_by(patientId=current_user.id).order_by(Appointment.id.desc()).all()
+    result = []
+    for apt in appointments:
+        doctor = Doctor.query.get(apt.doctorId)
+        result.append({
+            'id': apt.id,
+            'doctorName': doctor.name if doctor else 'Unknown Doctor',
+            'specialization': doctor.specialization if doctor else '',
+            'date': apt.date,
+            'time': apt.time,
+            'symptoms': apt.symptoms,
+            'status': apt.status
+        })
+    return jsonify({'appointments': result})
+
 # 8. Dashboard Stats
 @app.route('/api/dashboard/stats', methods=['GET'])
 @token_required
 def get_stats(current_user):
-    upcoming = Appointment.query.filter_by(patientId=current_user.id, status='upcoming').count()
+    total     = Appointment.query.filter_by(patientId=current_user.id).count()
+    upcoming  = Appointment.query.filter_by(patientId=current_user.id, status='upcoming').count()
+    completed = Appointment.query.filter_by(patientId=current_user.id, status='completed').count()
 
     return jsonify({
-        'upcomingAppointments': upcoming,
-        'prescriptions': 2, 
-        'labReports': 1     
+        'totalAppointments':     total,
+        'upcomingAppointments':  upcoming,
+        'completedAppointments': completed,
     })
+
+# --- Initialize Database (Runs for both local and production) ---
+with app.app_context():
+    db.create_all()
+    print("[OK] Database Connected & Tables Checked!")
 
 # --- Main Entry ---
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        print("Database Connected & Tables Checked!")
-
-    app.run(port=3000, debug=True)
+    port = int(os.environ.get('PORT', 3000))
+    app.run(host='0.0.0.0', port=port, debug=os.environ.get('FLASK_ENV') != 'production')

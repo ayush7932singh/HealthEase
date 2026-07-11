@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
     
     <style>
         /* --- Receipt Specific Styles --- */
@@ -15,7 +16,7 @@
         
         .receipt-container { 
             max-width: 600px; margin: 50px auto; 
-            background: white; padding: 40px; 
+            background: var(--bg-secondary); padding: 40px; 
             border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
             position: relative; overflow: hidden; 
         }
@@ -26,7 +27,7 @@
         }
         
         .receipt-header h1 { font-size: 1.8rem; color: #007bff; margin-bottom: 5px; }
-        .receipt-header p { color: #64748b; font-size: 0.9rem; }
+        .receipt-header p { color: var(--text-muted); font-size: 0.9rem; }
         
         .receipt-body { margin-bottom: 20px; }
         
@@ -35,8 +36,8 @@
             margin-bottom: 12px; font-size: 0.95rem; 
         }
         
-        .receipt-label { color: #666; font-weight: 500; }
-        .receipt-value { color: #333; font-weight: 600; text-align: right; }
+        .receipt-label { color: var(--text-muted); font-weight: 500; }
+        .receipt-value { color: var(--text-primary); font-weight: 600; text-align: right; }
         
         .total-row { 
             border-top: 2px solid #eee; padding-top: 15px; 
@@ -57,12 +58,13 @@
         
         @media print { 
             header, .receipt-actions { display: none; } 
-            body { background: white; } 
+            body { background: var(--bg-secondary); } 
             .receipt-container { box-shadow: none; margin: 0; border: 1px solid #eee; } 
         }
     </style>
 </head>
 <body>
+    <div class="blob-container"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
 
     <header>
         <div class="container header-container">

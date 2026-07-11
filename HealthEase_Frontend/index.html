@@ -8,11 +8,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
     
     <style>
         body { display: flex; flex-direction: column; min-height: 100vh; }
         footer { margin-top: auto; }
-        .loading-spinner { text-align: center; padding: 20px; color: #64748b; font-size: 1.2rem; grid-column: 1 / -1; }
+        .loading-spinner { text-align: center; padding: 20px; color: var(--text-muted); font-size: 1.2rem; grid-column: 1 / -1; }
         
         /* Highlight Admin Link */
         .admin-nav-link {
@@ -110,7 +111,7 @@
         }
         
         .feature-card {
-            background: white;
+            background: var(--bg-secondary);
             padding: 30px 20px;
             border-radius: 12px;
             text-align: center;
@@ -131,11 +132,11 @@
         .feature-card h3 {
             font-size: 1.2rem;
             margin-bottom: 10px;
-            color: #333;
+            color: var(--text-primary);
         }
         
         .feature-card p {
-            color: #666;
+            color: var(--text-muted);
             font-size: 0.95rem;
             line-height: 1.5;
         }
@@ -148,6 +149,10 @@
     </style>
 </head>
 <body>
+    <div class="blob-container">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
     <header>
         <div class="container header-container">
             <div class="logo">
@@ -198,7 +203,7 @@
             </div>
             <div class="hero-image">
                 <img src="https://img.freepik.com/free-photo/portrait-smiling-handsome-male-doctor-man_171337-5055.jpg?w=740" alt="Doctor">
-                <div class="floating-card">
+                <div class="floating-card glass-card">
                     <i class="fas fa-user-md"></i>
                     <div><p>Expert Doctors</p><small>Online Now</small></div>
                 </div>
@@ -358,7 +363,7 @@
         // ==========================================
         // CONFIGURATION
         // ==========================================
-        const API_BASE = 'http://127.0.0.1:3000/api';
+        const API_BASE = '/api';
 
         // ==========================================
         // INITIALIZATION
@@ -422,7 +427,7 @@
                     // Show Logout Button
                     if (container) {
                         container.innerHTML = `
-                            <span style="margin-right: 15px; color: #666;">
+                            <span style="margin-right: 15px; color: var(--text-muted);">
                                 <i class="fas fa-user-circle"></i> ${user.name.split(' ')[0]}
                             </span>
                             <button class="btn btn-outline" onclick="logout()">
@@ -777,17 +782,17 @@
             
             // Exactly 3 features for homepage
             grid.innerHTML = `
-                <div class="feature-card">
+                <div class="feature-card glass-card">
                     <i class="fas fa-user-md"></i>
                     <h3>Expert Doctors</h3>
                     <p>Access to 50+ certified specialists across 20+ medical fields, available for consultation.</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card glass-card">
                     <i class="fas fa-calendar-check"></i>
                     <h3>Easy Booking</h3>
                     <p>Book appointments 24/7 with real-time availability tracking and instant confirmation.</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card glass-card">
                     <i class="fas fa-file-medical-alt"></i>
                     <h3>Digital Records</h3>
                     <p>Securely store and access your medical history, prescriptions, and lab reports online.</p>
@@ -806,12 +811,12 @@
                 if (data.doctors && data.doctors.length > 0) {
                     const top3 = data.doctors.slice(0, 3);
                     grid.innerHTML = top3.map(doc => `
-                        <div style="background:white; padding:20px; border-radius:12px; text-align:center; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+                        <div class="glass-card" style="padding:20px; border-radius:12px; text-align:center;">
                             <img src="${doc.image}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom:15px;" 
                                  onerror="this.src='https://ui-avatars.com/api/?name=${doc.name}&background=007bff&color=fff&size=80'">
-                            <h3 style="font-size:1.1rem; color:#1e293b; margin-bottom:5px;">${doc.name}</h3>
+                            <h3 style="font-size:1.1rem; color: var(--text-primary); margin-bottom:5px;">${doc.name}</h3>
                             <p style="color:#007bff; font-size:0.9rem; margin-bottom:5px;">${doc.specialization}</p>
-                            <p style="color:#666; font-size:0.9rem;">⭐ ${doc.rating || 4.5} | ${doc.experience || 10}+ years</p>
+                            <p style="color: var(--text-muted); font-size:0.9rem;">⭐ ${doc.rating || 4.5} | ${doc.experience || 10}+ years</p>
                         </div>
                     `).join('');
                 } else {
@@ -827,11 +832,11 @@
                 ];
                 
                 grid.innerHTML = offlineDoctors.map(doc => `
-                    <div style="background:white; padding:20px; border-radius:12px; text-align:center; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+                    <div class="glass-card" style="padding:20px; border-radius:12px; text-align:center;">
                         <img src="https://ui-avatars.com/api/?name=${doc.name}&background=007bff&color=fff&size=80" style="width:80px; height:80px; border-radius:50%; margin-bottom:15px;">
-                        <h3 style="font-size:1.1rem; color:#1e293b; margin-bottom:5px;">${doc.name}</h3>
+                        <h3 style="font-size:1.1rem; color: var(--text-primary); margin-bottom:5px;">${doc.name}</h3>
                         <p style="color:#007bff; font-size:0.9rem; margin-bottom:5px;">${doc.specialization}</p>
-                        <p style="color:#666; font-size:0.9rem;">⭐ ${doc.rating} | ${doc.experience}+ years</p>
+                        <p style="color: var(--text-muted); font-size:0.9rem;">⭐ ${doc.rating} | ${doc.experience}+ years</p>
                     </div>
                 `).join('');
             }

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
     
     <style>
         /* --- Layout Fixes --- */
@@ -105,15 +106,15 @@
 
         /* Chat Sidebar */
         .chat-sidebar {
-            background: white; border-radius: 15px;
+            background: var(--bg-secondary); border-radius: 15px;
             display: flex; flex-direction: column;
-            overflow: hidden; color: #333;
+            overflow: hidden; color: var(--text-primary);
         }
 
         .chat-header {
-            padding: 15px; background: #f8f9fa;
+            padding: 15px; background: var(--bg-primary);
             border-bottom: 1px solid #eee;
-            font-weight: 600; color: #1e293b;
+            font-weight: 600; color: var(--text-primary);
             display: flex; justify-content: space-between; align-items: center;
         }
 
@@ -133,7 +134,7 @@
 
         .chat-input {
             padding: 15px; border-top: 1px solid #eee;
-            display: flex; gap: 10px; background: #f8f9fa;
+            display: flex; gap: 10px; background: var(--bg-primary);
         }
 
         .typing-indicator {
@@ -153,12 +154,13 @@
     </style>
 </head>
 <body>
+    <div class="blob-container"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
 
-    <header style="background: white; padding: 15px 0;">
+    <header style="background: var(--bg-secondary); padding: 15px 0;">
         <div class="container header-container">
-            <div class="logo"><i class="fas fa-heartbeat" style="color: #007bff;"></i> <span style="color: #1e293b;">HealthEase</span></div>
+            <div class="logo"><i class="fas fa-heartbeat" style="color: #007bff;"></i> <span style="color: var(--text-primary);">HealthEase</span></div>
             <nav>
-                <a href="dashboard.html" class="btn btn-outline" style="color: #1e293b; border-color: #ddd;">
+                <a href="dashboard.html" class="btn btn-outline" style="color: var(--text-primary); border-color: #ddd;">
                     <i class="fas fa-arrow-left"></i> Leave Consult
                 </a>
             </nav>
