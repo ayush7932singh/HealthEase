@@ -1,3 +1,7 @@
+# HealthEase
+
+🚀 **Live Demo:** [https://healthease-a0gz.onrender.com](https://healthease-a0gz.onrender.com)
+
 HealthEase is a digital healthcare solution designed to provide hospital-like facilities at home, offering a
 convenient and efficient way for patients to access healthcare services without the need to visit a hospital
 or clinic. The system connects patients with a wide range of healthcare providers, including doctors,
