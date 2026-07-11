@@ -526,8 +526,10 @@
                         }
                     }, 1000);
                 } else {
-                    // Try offline login
-                    handleOfflineLogin(email, password);
+                    const data = await res.json();
+                    errorDiv.innerHTML = data.message || 'Invalid credentials';
+                    errorDiv.style.display = 'block';
+                    showNotification(data.message || 'Login failed', 'error');
                 }
             } catch (err) {
                 console.log('API not available, using offline mode');
@@ -570,19 +572,12 @@
                 setTimeout(() => window.location.href = 'dashboard.html', 1000);
             }
             else {
-                // Allow any login for demo
-                const name = email.split('@')[0];
-                const user = { 
-                    id: Date.now(), 
-                    name: name, 
-                    email: email, 
-                    role: 'patient' 
-                };
-                localStorage.setItem('user', JSON.stringify(user));
-                localStorage.setItem('token', 'demo-token-' + Date.now());
-                showNotification(`Welcome ${name}! (Demo Mode)`, 'success');
-                closeAuthModal();
-                setTimeout(() => window.location.href = 'dashboard.html', 1000);
+                const errorDiv = document.getElementById('loginError');
+                if (errorDiv) {
+                    errorDiv.innerHTML = 'Invalid credentials';
+                    errorDiv.style.display = 'block';
+                }
+                showNotification('Invalid credentials', 'error');
             }
         }
 
