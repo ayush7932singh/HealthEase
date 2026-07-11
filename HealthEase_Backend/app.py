@@ -208,59 +208,15 @@ def get_doctors():
         })
     return jsonify({'doctors': result})
 
-# 5. Seed Doctors (Total 6 Doctors)
-@app.route('/api/seed_doctors', methods=['GET'])
-def seed_doctors():
-    if Doctor.query.count() >= 6:
-        return jsonify({'message': 'All 6 Doctors already exist in database'})
-    
-    # 1. Cardiologist
-    doc1 = Doctor(name="Dr. Sharma", specialization="Cardiologist", experience=10, rating=4.5, consultation_fee=500, description="Heart specialist.", image="https://img.freepik.com/free-photo/doctor-with-his-arms-crossed-white-background_1368-5790.jpg")
-    # 2. Dermatologist
-    doc2 = Doctor(name="Dr. Verma", specialization="Dermatologist", experience=8, rating=4.8, consultation_fee=400, description="Skin specialist.", image="https://img.freepik.com/free-photo/woman-doctor-wearing-lab-coat-with-stethoscope-isolated_1303-29791.jpg")
-    # 3. Pediatrician
-    doc3 = Doctor(name="Dr. Anita Roy", specialization="Pediatrician", experience=12, rating=4.9, consultation_fee=600, description="Child specialist.", image="https://img.freepik.com/free-photo/portrait-smiling-medical-worker-girl-doctor-white-coat-holding-clipboard_1258-88134.jpg")
-    # 4. Neurologist
-    doc4 = Doctor(name="Dr. Rajesh Gupta", specialization="Neurologist", experience=15, rating=4.7, consultation_fee=800, description="Brain specialist.", image="https://img.freepik.com/free-photo/portrait-successful-mid-adult-doctor-with-crossed-arms_1262-12865.jpg")
-    # 5. Orthopedic
-    doc5 = Doctor(name="Dr. Vikram Singh", specialization="Orthopedic", experience=14, rating=4.6, consultation_fee=700, description="Bone specialist.", image="https://img.freepik.com/free-photo/doctor-standing-with-folder-stethoscope_1291-16.jpg")
-    # 6. Psychiatrist
-    doc6 = Doctor(name="Dr. Meera Nair", specialization="Psychiatrist", experience=9, rating=4.8, consultation_fee=900, description="Mental health.", image="https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg")
-    
-    docs = [doc1, doc2, doc3, doc4, doc5, doc6]
-    added_count = 0
-    
-    for doc in docs:
-        if not Doctor.query.filter_by(name=doc.name).first():
-            db.session.add(doc)
-            added_count += 1
-    
-    db.session.commit()
-    return jsonify({'message': f'{added_count} new doctors added! Total 6 available.'})
+# 5. Seed Doctors (Total 6 Doctors) - DISABLED FOR PRODUCTION
+# @app.route('/api/seed_doctors', methods=['GET'])
+# def seed_doctors():
+#     return jsonify({'message': 'Endpoint disabled'})
 
-# 6. Seed Admin
-@app.route('/api/seed_admin', methods=['GET'])
-def seed_admin():
-    email = "admin@healthease.com" 
-    password = "admin123"
-    
-    if User.query.filter_by(email=email).first():
-        return jsonify({'message': 'Admin user already exists!'})
-    
-    admin_user = User(
-        name="Super Admin",
-        email=email,
-        password_hash=generate_password_hash(password),
-        role="admin",  
-        phone="9876543210",
-        address="Admin Office, HealthEase",
-        dob="1990-01-01"
-    )
-    
-    db.session.add(admin_user)
-    db.session.commit()
-    
-    return jsonify({'message': f'Admin created! Email: {email}, Password: {password}'})
+# 6. Seed Admin - DISABLED FOR PRODUCTION
+# @app.route('/api/seed_admin', methods=['GET'])
+# def seed_admin():
+#     return jsonify({'message': 'Endpoint disabled'})
 
 # 7. Book Appointment
 @app.route('/api/appointments', methods=['POST'])

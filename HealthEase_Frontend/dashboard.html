@@ -685,7 +685,7 @@ function loadUserData() {
 
         const hour = new Date().getHours();
         const greetText = hour < 12 ? "Good Morning" : (hour < 18 ? "Good Afternoon" : "Good Evening");
-        document.getElementById("greeting").innerHTML = `${greetText}, ${patientName}! 👋`;
+        document.getElementById("greeting").textContent = `${greetText}, ${patientName}! 👋`;
         document.getElementById("greetingMessage").textContent = "Here is your health summary for today. Stay healthy!";
     } catch (e) {
         console.error("User data load error", e);
