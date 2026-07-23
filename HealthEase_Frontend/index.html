@@ -821,9 +821,9 @@
                 console.log('Using offline doctor data');
                 // Fallback doctors - exactly 3
                 const offlineDoctors = [
-                    { name: 'Dr. Sarah Johnson', specialization: 'Cardiologist', rating: 4.9, experience: 15 },
-                    { name: 'Dr. Michael Chen', specialization: 'Neurologist', rating: 4.8, experience: 12 },
-                    { name: 'Dr. Emily Davis', specialization: 'Pediatrician', rating: 4.7, experience: 10 }
+                    { name: 'Dr. Sarah Johnson', specialization: 'Cardiologist', rating: 4.9, experience: 15, image: 'https://randomuser.me/api/portraits/women/44.jpg' },
+                    { name: 'Dr. Michael Chen', specialization: 'Neurologist', rating: 4.8, experience: 12, image: 'https://randomuser.me/api/portraits/men/32.jpg' },
+                    { name: 'Dr. Emily Davis', specialization: 'Pediatrician', rating: 4.7, experience: 10, image: 'https://randomuser.me/api/portraits/women/68.jpg' }
                 ];
                 
                 grid.innerHTML = offlineDoctors.map(doc => `
