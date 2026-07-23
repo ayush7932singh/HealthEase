@@ -208,10 +208,27 @@ def get_doctors():
         })
     return jsonify({'doctors': result})
 
-# 5. Seed Doctors (Total 6 Doctors) - DISABLED FOR PRODUCTION
-# @app.route('/api/seed_doctors', methods=['GET'])
-# def seed_doctors():
-#     return jsonify({'message': 'Endpoint disabled'})
+# 5. Seed Doctors (Total 6 Doctors)
+@app.route('/api/seed_doctors', methods=['GET'])
+def seed_doctors():
+    if Doctor.query.count() > 0:
+        return jsonify({'message': 'Doctors already seeded'})
+    
+    doctors_data = [
+        {'name': 'Dr. Sarah Johnson', 'specialization': 'Cardiologist', 'experience': 15, 'rating': 4.9, 'consultation_fee': 500, 'image': '', 'description': 'Expert in cardiovascular health.'},
+        {'name': 'Dr. Michael Chen', 'specialization': 'Neurologist', 'experience': 12, 'rating': 4.8, 'consultation_fee': 600, 'image': '', 'description': 'Specialist in brain and nervous system.'},
+        {'name': 'Dr. Emily Davis', 'specialization': 'Pediatrician', 'experience': 10, 'rating': 4.7, 'consultation_fee': 450, 'image': '', 'description': 'Dedicated to children health and wellness.'},
+        {'name': 'Dr. Vikram Singh', 'specialization': 'Orthopedic', 'experience': 14, 'rating': 4.8, 'consultation_fee': 700, 'image': '', 'description': 'Expert in bone and joint care.'},
+        {'name': 'Dr. Priya Patel', 'specialization': 'Dermatologist', 'experience': 8, 'rating': 4.6, 'consultation_fee': 400, 'image': '', 'description': 'Specialist in skin, hair, and nail treatments.'},
+        {'name': 'Dr. Robert Smith', 'specialization': 'Psychiatrist', 'experience': 20, 'rating': 4.9, 'consultation_fee': 800, 'image': '', 'description': 'Mental health expert.'}
+    ]
+    
+    for d_data in doctors_data:
+        doc = Doctor(**d_data)
+        db.session.add(doc)
+    
+    db.session.commit()
+    return jsonify({'message': '6 Doctors seeded successfully!'})
 
 # 6. Seed Admin - DISABLED FOR PRODUCTION
 # @app.route('/api/seed_admin', methods=['GET'])
