@@ -815,7 +815,7 @@
                         </div>
                     `).join('');
                 } else {
-                    grid.innerHTML = '<p style="text-align:center; grid-column:1/-1;">No doctors found.</p>';
+                    throw new Error('No doctors found in production DB');
                 }
             } catch (e) {
                 console.log('Using offline doctor data');
