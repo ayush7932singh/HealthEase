@@ -217,7 +217,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: top;
+            object-position: center;
             transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
         }
         .doctor-card:hover .doc-img-container img { transform: scale(1.08); }
@@ -805,7 +805,7 @@
 
             if (filtered.length > 0) {
                 grid.innerHTML = filtered.map((doc, i) => {
-                    const rating = doc.rating || (4.3 + Math.random() * 0.7).toFixed(1);
+                    const rating = parseFloat(doc.rating || (4.3 + Math.random() * 0.7).toFixed(1));
                     const reviews = reviewsArr[i % reviewsArr.length];
                     const degrees = degreesArr[i % degreesArr.length];
                     const exp = doc.experience || (6 + (i * 2));
@@ -814,7 +814,7 @@
                     let starsHtml = '';
                     for (let s = 0; s < fullStars; s++) starsHtml += '<i class="fas fa-star"></i>';
                     if (halfStar) starsHtml += '<i class="fas fa-star-half-alt"></i>';
-                    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+                    const emptyStars = Math.max(0, 5 - fullStars - (halfStar ? 1 : 0));
                     for (let s = 0; s < emptyStars; s++) starsHtml += '<i class="far fa-star"></i>';
 
                     const imgSrc = doc.image
