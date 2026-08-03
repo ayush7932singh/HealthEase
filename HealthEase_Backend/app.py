@@ -39,6 +39,11 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-super-secret-and-c
 db = SQLAlchemy(app)
 CORS(app)
 
+# Disable template caching so fresh HTML is always served after deployments
+app.jinja_env.auto_reload = True
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+
 # --- Models ---
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -105,14 +110,24 @@ def token_required(f):
 @app.route('/')
 def home():
     try:
-        return render_template('index.html')
+        from flask import make_response
+        response = make_response(render_template('index.html'))
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
     except Exception as e:
         return f"Error: Could not find index.html in ../HealthEase_Frontend. {str(e)}"
 
 @app.route('/<page_name>.html')
 def serve_pages(page_name):
     try:
-        return render_template(f'{page_name}.html')
+        from flask import make_response
+        response = make_response(render_template(f'{page_name}.html'))
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
     except Exception as e:
         return f"Error: Could not find {page_name}.html. {str(e)}", 404
 
