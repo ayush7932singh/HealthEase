@@ -22,7 +22,10 @@
             min-height: 100vh;
             color: #F8FAFC;
             font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
         }
+        /* Hide global blobs on this page — has its own dark design */
+        .blob-container { display: none !important; }
 
         /* 2. Sticky Premium Navbar */
         header {
@@ -533,10 +536,6 @@
     </style>
 </head>
 <body>
-    <div class="blob-container">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-    </div>
 
     <header>
         <div class="container header-container">
