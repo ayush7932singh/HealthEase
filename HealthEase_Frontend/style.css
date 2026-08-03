@@ -116,12 +116,13 @@ body {
     position: absolute;
     border-radius: 50%;
     filter: blur(100px);
-    opacity: 0.15;
+    opacity: 0;
     animation: floatBlob 20s infinite ease-in-out alternate;
     transition: opacity 0.3s ease;
+    z-index: -1;
 }
 body.dark-theme .blob {
-    opacity: 0.25;
+    opacity: 0;
 }
 .blob-1 {
     width: 450px;

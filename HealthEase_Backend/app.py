@@ -3,7 +3,7 @@ import jwt
 import datetime
 import urllib.parse
 from functools import wraps
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, send_from_directory
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
@@ -107,23 +107,23 @@ def token_required(f):
 #  FRONTEND ROUTES (This fixes the 404 Error)
 # ==========================================
 
+FRONTEND_DIR = os.path.join(os.path.dirname(__file__), '..', 'HealthEase_Frontend')
+
 @app.route('/')
 def home():
     try:
-        from flask import make_response
-        response = make_response(render_template('index.html'))
+        response = send_from_directory(FRONTEND_DIR, 'index.html')
         response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
         return response
     except Exception as e:
-        return f"Error: Could not find index.html in ../HealthEase_Frontend. {str(e)}"
+        return f"Error: {str(e)}", 404
 
 @app.route('/<page_name>.html')
 def serve_pages(page_name):
     try:
-        from flask import make_response
-        response = make_response(render_template(f'{page_name}.html'))
+        response = send_from_directory(FRONTEND_DIR, f'{page_name}.html')
         response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
